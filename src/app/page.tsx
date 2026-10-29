@@ -1,68 +1,186 @@
-import Image from "next/image";
+"use client";
+
+import { useCallback, useRef, useState } from "react";
+import Recorder from "@/components/Recorder";
+import Uploader from "@/components/Uploader";
+import ContextForm from "@/components/ContextForm";
+import Board from "@/components/Board";
+import TranscriptPanel from "@/components/TranscriptPanel";
+import ShareCard from "@/components/ShareCard";
+import { encodeShareUrl } from "@/lib/share";
+import type { MeetingMeta, Transcript } from "@/lib/types";
+import type { ParsedExtracted } from "@/lib/schema";
+
+type Stage = "idle" | "recorded" | "transcribed" | "extracted" | "done" | "error";
 
 export default function Home() {
+  const [stage, setStage] = useState<Stage>("idle");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [meta, setMeta] = useState<MeetingMeta>({});
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [transcript, setTranscript] = useState<Transcript | null>(null);
+  const [extracted, setExtracted] = useState<{ result: ParsedExtracted; promptVersion: string } | null>(null);
+  const [activeTs, setActiveTs] = useState<string | undefined>(undefined);
+  const fileRef = useRef<HTMLAudioElement>(null);
+
+  const onAudio = useCallback((blob: Blob, _mime: string) => {
+    setAudioBlob(blob);
+    setStage("recorded");
+    setError(null);
+    setTranscript(null);
+    setExtracted(null);
+    const url = URL.createObjectURL(blob);
+    if (fileRef.current) fileRef.current.src = url;
+  }, []);
+
+  const process = useCallback(async () => {
+    if (!audioBlob) return;
+    setBusy(true);
+    setError(null);
+    try {
+      // 1. Transcribe
+      setStage("recorded");
+      const fd = new FormData();
+      fd.append("audio", audioBlob, "recording.webm");
+      fd.append("title", meta.title ?? "");
+      fd.append("attendees", meta.attendees ?? "");
+      fd.append("kind", meta.kind ?? "");
+      const tRes = await fetch("/api/transcribe", { method: "POST", body: fd });
+      const tJson = await tRes.json();
+      if (!tRes.ok) throw new Error(tJson.error ?? `Transcription failed (${tRes.status})`);
+      const t: Transcript = tJson;
+      setTranscript(t);
+      setStage("transcribed");
+
+      // 2. Extract
+      const eRes = await fetch("/api/extract", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          transcript: t.text,
+          segments: t.segments,
+          meta: { ...meta, source: "recorded" },
+        }),
+      });
+      const eJson = await eRes.json();
+      if (!eRes.ok) throw new Error(eJson.error ?? `Extraction failed (${eRes.status})`);
+      setExtracted(eJson as { result: ParsedExtracted; promptVersion: string });
+      setStage("done");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+      setStage("error");
+    } finally {
+      setBusy(false);
+    }
+  }, [audioBlob, meta]);
+
+  const postSlack = useCallback(async (webhookUrl: string) => {
+    if (!extracted) return { ok: false, error: "Nothing to post yet." };
+    const shareUrl = encodeShareUrl(
+      {
+        meta,
+        extracted: extracted.result,
+        transcript: { text: transcript?.text ?? "", segments: transcript?.segments ?? [] },
+        promptVersion: extracted.promptVersion,
+      },
+      typeof window !== "undefined" ? window.location.origin : undefined,
+    ).url;
+    const res = await fetch("/api/slack", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        webhookUrl,
+        extracted: extracted.result,
+        meta,
+        shareUrl,
+      }),
+    });
+    return res.json();
+  }, [extracted, meta, transcript]);
+
+  const shareUrl =
+    stage === "done" && extracted && transcript
+      ? encodeShareUrl(
+          {
+            meta,
+            extracted: extracted.result,
+            transcript: { text: transcript.text, segments: transcript.segments },
+            promptVersion: extracted.promptVersion,
+          },
+          typeof window !== "undefined" ? window.location.origin : undefined,
+        ).url
+      : "";
+
+  const missingKey = error?.includes("GROQ_API_KEY");
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <div className="flex min-h-full flex-col bg-zinc-50 dark:bg-zinc-950">
+      <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-10">
+        <header>
+          <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+            NoHands Log
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="mt-1 text-zinc-500 dark:text-zinc-400">
+            One spoken paragraph per meeting → a finished board of decisions, actions, owners, and open questions.
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+        </header>
+
+        {missingKey && (
+          <div className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-200">
+            GROQ_API_KEY is not configured. Add it to <code>.env.local</code> to enable processing —
+            see the README for setup.
+          </div>
+        )}
+
+        <audio ref={fileRef} controls className="hidden" />
+
+        <section className="flex flex-col gap-4">
+          <Recorder onAudio={onAudio} disabled={busy} />
+          <Uploader onAudio={onAudio} disabled={busy} />
+          <ContextForm onSubmit={(m) => setMeta(m)} disabled={busy} />
+        </section>
+
+        <section>
+          <button
+            type="button"
+            onClick={process}
+            disabled={!audioBlob || busy}
+            className="w-full rounded-xl bg-zinc-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white"
           >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
+            {busy
+              ? "Processing…"
+              : stage === "done"
+                ? "Process again"
+                : "Process → decision board"}
+          </button>
+          {busy && stage !== "done" && (
+            <p className="mt-2 text-center text-sm text-zinc-400">
+              {stage === "transcribed" ? "Extracting board…" : "Transcribing…"}
+            </p>
+          )}
+        </section>
+
+        {error && !missingKey && (
+          <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-sm text-red-800 dark:border-red-800 dark:bg-red-950/40 dark:text-red-300">
+            {error}
+          </div>
+        )}
+
+        {transcript && (
+          <TranscriptPanel segments={transcript.segments} activeTs={activeTs} />
+        )}
+
+        {extracted && stage === "done" && (
+          <>
+            <Board
+              extracted={extracted.result}
+              meta={meta}
+              onSeek={(ts) => setActiveTs(ts)}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+            <ShareCard shareUrl={shareUrl} onSlack={postSlack} />
+          </>
+        )}
       </main>
     </div>
   );

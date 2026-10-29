@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Meeting-Decision-Logger (NoHands Log)
 
-## Getting Started
+One spoken paragraph per meeting → a finished board of decisions, actions, owners, and open questions.
 
-First, run the development server:
+## Environment
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Copy `.env.local.example` to `.env.local` and fill in:
+
+```env
+GROQ_API_KEY=            # required for transcribe + extract
+STT_MODEL=whisper-large-v3-turbo
+LLM_MODEL=llama-3.3-70b-versatile
+# Optional persistence (share links work without it):
+# SUPABASE_URL=
+# SUPABASE_SERVICE_KEY=
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The app renders with a clear banner when `GROQ_API_KEY` is missing — no crash.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Run
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm install
+npm run dev
+# open http://localhost:3000
+```
 
-## Learn More
+## Roadmap
 
-To learn more about Next.js, take a look at the following resources:
+The build plan lives on the `docs` branch: `docs/04-implementation-roadmap.md`.
+Read `docs/03-technical-spec.md` first for "what to build and how".
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Status
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- [x] Scaffold (Next 16 + Tailwind v4 + TS, App Router, `src/`)
+- [x] `lib/types.ts`
+- [x] `lib/groq.ts`, `lib/extractPrompt.ts`, `lib/schema.ts`, `lib/share.ts`
+- [x] API routes: `POST /api/transcribe`, `POST /api/extract`, `POST /api/slack`
+- [x] Components: `Recorder`, `Uploader`, `ContextForm`, `Board`, `TranscriptPanel`, `ShareCard`
+- [x] `/m/[slug]` read-only share view
+- [x] `/` page composed with the `idle → recorded → transcribed → extracted → done` state machine
+- [ ] Day 1 exit gate: record a 30s standup on localhost → finished board in < 30s
+- [ ] Optional Supabase persistence (`POST /api/results`, `GET /api/results/[id]`)
+- [ ] Deploy to Vercel
 
-## Deploy on Vercel
+## Learn more
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Deploy on Vercel](https://vercel.com/docs)
