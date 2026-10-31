@@ -141,12 +141,15 @@ export default function Board({
 
   const cancelEdit = () => setEdit(null);
 
-  const editInput = (cell: CellEdit, label: string) => (
+  // `cell` only identifies which field is open; the live draft lives in `edit` state.
+  const editInput = (cell: CellEdit, label: string) => {
+    const live = edit ?? cell;
+    return (
     <input
       autoFocus
       aria-label={label}
-      value={cell.draft}
-      onChange={(e) => setEdit({ ...cell, draft: e.target.value })}
+      value={live.draft}
+      onChange={(e) => setEdit({ ...live, draft: e.target.value })}
       onKeyDown={(e) => {
         if (e.key === "Enter") commitEdit();
         if (e.key === "Escape") cancelEdit();
@@ -154,7 +157,8 @@ export default function Board({
       onBlur={commitEdit}
       className="w-full min-w-0 rounded-md border border-emerald-500 bg-white px-1.5 py-0.5 text-[13px] text-zinc-900 outline-none ring-2 ring-emerald-500/25 dark:bg-zinc-950 dark:text-zinc-100"
     />
-  );
+    );
+  };
 
   const deleteItem = (section: CellEdit["section"], index: number) => {
     if (!editable) return;
