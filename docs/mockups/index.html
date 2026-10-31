@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NoHands Log: UI mockup options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Instrument+Serif&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Geist,system-ui,sans-serif;background:#f4f4f5;color:#18181b;line-height:1.45;font-size:14px}
+.wrap{max-width:1240px;margin:0 auto;padding:32px 20px 80px}
+header.top h1{font-size:28px;font-weight:700;letter-spacing:-.02em}
+header.top p{color:#52525b;max-width:760px;margin-top:6px}
+nav.opts{display:flex;gap:8px;margin:24px 0 8px;flex-wrap:wrap;position:sticky;top:0;background:#f4f4f5;padding:10px 0;z-index:5}
+nav.opts a{padding:8px 14px;border-radius:999px;border:1px solid #d4d4d8;color:#27272a;text-decoration:none;font-weight:500;background:#fff}
+nav.opts a.on{background:#18181b;color:#fff;border-color:#18181b}
+section.opt{display:none}section.opt.on{display:block}
+.why{background:#fff;border:1px solid #e4e4e7;border-radius:14px;padding:18px 20px;margin:16px 0 22px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:20px}
+.why h2{font-size:20px;letter-spacing:-.01em}.why h3{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#71717a;margin-bottom:6px}
+.why ul{padding-left:16px;color:#3f3f46}.why p{color:#3f3f46;margin-top:6px}
+@media(max-width:860px){.why{grid-template-columns:1fr}}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.frame{border-radius:14px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.06),0 10px 30px -12px rgba(0,0,0,.18);border:1px solid #e4e4e7;background:#fff}
+.label{font-size:12px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:flex;justify-content:space-between}
+.label span:last-child{font-weight:400;text-transform:none;letter-spacing:0}
+.chrome{height:30px;background:#f4f4f5;border-bottom:1px solid #e4e4e7;display:flex;align-items:center;gap:6px;padding:0 12px}
+.chrome i{width:9px;height:9px;border-radius:50%;background:#d4d4d8;display:block}
+.chrome b{margin-left:10px;font:400 11px 'Geist Mono',monospace;color:#71717a;background:#fff;border-radius:6px;padding:2px 10px;flex:1;max-width:280px}
+.scr{padding:22px;min-height:420px}
+.mono{font-family:'Geist Mono',monospace}
+@keyframes pulse{0%,100%{opacity:.45}50%{opacity:1}}
+@keyframes shimmer{0%{background-position:-200px 0}100%{background-position:200px 0}}
+@keyframes bar{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
+@keyframes blink{50%{opacity:0}}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.skel{background:linear-gradient(90deg,#f4f4f5 0,#e4e4e7 50%,#f4f4f5 100%);background-size:400px 100%;animation:shimmer 1.3s infinite linear;border-radius:6px;height:12px}
+.caret{display:inline-block;width:2px;height:1em;background:currentColor;vertical-align:-2px;animation:blink 1s steps(1) infinite}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:2px 8px;border-radius:999px}
+.rec{background:#fff;border:2px solid #10b981;border-radius:14px;padding:20px 22px;margin-top:28px}
+.rec h2{font-size:20px}.rec p{margin-top:6px;color:#3f3f46;max-width:900px}
+
+/* ---------- OPTION A: Ledger (spec-faithful, calm single column) ---------- */
+.A{background:#fafafa}
+.A .hero h3{font-size:22px;font-weight:700;letter-spacing:-.02em}
+.A .hero p{color:#52525b;font-size:13px}
+.A .wf{font-size:11px;color:#059669;background:#ecfdf5;border:1px solid #a7f3d0;padding:2px 8px;border-radius:999px;display:inline-block;margin-top:6px}
+.A .card{background:#fff;border:1px solid #e4e4e7;border-radius:12px;padding:14px;margin-top:14px}
+.A .tabs{display:flex;gap:4px;background:#f4f4f5;border-radius:8px;padding:3px;width:max-content;margin-bottom:10px}
+.A .tabs span{padding:4px 12px;border-radius:6px;font-size:12px;color:#52525b}
+.A .tabs .on{background:#fff;color:#18181b;font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.A textarea{width:100%;border:1px solid #d4d4d8;border-radius:8px;padding:10px;font:inherit;font-size:13px;height:96px;resize:none;color:#27272a;outline:2px solid #10b98133}
+.A .hint{font-size:12px;color:#71717a;margin-top:6px;display:flex;align-items:center;gap:6px}
+.A kbd{font:500 10px 'Geist Mono',monospace;border:1px solid #d4d4d8;border-bottom-width:2px;border-radius:4px;padding:0 4px;background:#fff}
+.A .chips{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.A .chips span{font-size:11px;border:1px dashed #d4d4d8;border-radius:999px;padding:3px 9px;color:#52525b}
+.A .btn{margin-top:12px;background:#18181b;color:#fff;border-radius:8px;padding:9px 14px;font-weight:600;font-size:13px;display:flex;justify-content:space-between}
+.A .btn small{opacity:.6;font-weight:400}
+.A .steps li{list-style:none;display:flex;gap:10px;align-items:center;padding:7px 0;font-size:13px;border-bottom:1px solid #f4f4f5}
+.A .dot{width:16px;height:16px;border-radius:50%;display:grid;place-items:center;font-size:10px;color:#fff}
+.A .ok{background:#10b981}.A .run{border:2px solid #10b981;border-top-color:transparent;animation:spin 0.8s linear infinite}.A .wait{border:2px solid #e4e4e7}
+@keyframes spin{to{transform:rotate(360deg)}}
+.A .t{margin-left:auto;font-family:'Geist Mono',monospace;font-size:11px;color:#71717a}
+.A .sec h4{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#71717a;margin:12px 0 6px;display:flex;gap:6px;align-items:center}
+.A .sec h4 i{width:8px;height:8px;border-radius:2px;display:inline-block}
+.A .row{display:flex;gap:8px;align-items:flex-start;padding:7px 8px;border-radius:8px;font-size:13px}
+.A .row:hover,.A .row.sel{background:#f0fdf4}
+.A .row .meta{margin-left:auto;display:flex;gap:6px;flex-shrink:0}
+.A .own{background:#f4f4f5;color:#3f3f46}.A .un{background:#fef3c7;color:#92400e}
+.A .src{font-family:'Geist Mono',monospace;font-size:10px;color:#a1a1aa}
+.A .tx{font-size:12px;color:#52525b;background:#fafafa;border:1px solid #f4f4f5;border-radius:8px;padding:10px;margin-top:10px}
+.A .tx mark{background:#d1fae5;color:#065f46;border-radius:3px;padding:0 2px}
+.A .new{animation:in .5s both}
+
+/* ---------- OPTION B: Voice Stage (dark, Wispr-forward, kanban board) ---------- */
+.B{background:#0b0b10;color:#e4e4e7}
+.B .chrome{background:#15151c;border-color:#23232d}.B .chrome i{background:#33333f}.B .chrome b{background:#0b0b10;color:#71717a}
+.B .scr{background:radial-gradient(600px 300px at 50% -10%,#3b1d6e55,transparent),#0b0b10}
+.B .brand{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#a1a1aa}
+.B .brand b{color:#fff;font-size:14px}
+.B .stage{text-align:center;margin-top:34px}
+.B .orb{width:120px;height:120px;border-radius:50%;margin:0 auto;background:radial-gradient(circle at 35% 30%,#c4b5fd,#7c3aed 55%,#3b0764);box-shadow:0 0 0 10px #7c3aed22,0 0 60px #7c3aed88;display:flex;align-items:center;justify-content:center;gap:4px}
+.B .orb s{width:4px;height:36px;background:#fff;border-radius:2px;animation:bar 0.9s infinite ease-in-out;text-decoration:none;display:block}
+.B .orb s:nth-child(2){animation-delay:.15s}.B .orb s:nth-child(3){animation-delay:.3s}.B .orb s:nth-child(4){animation-delay:.45s}.B .orb s:nth-child(5){animation-delay:.6s}
+.B .stage h3{font-family:'Instrument Serif',serif;font-weight:400;font-size:30px;color:#fff;margin-top:22px;line-height:1.1}
+.B .stage p{color:#a1a1aa;font-size:13px;margin-top:6px}
+.B kbd{font:500 11px 'Geist Mono',monospace;background:#1f1f29;border:1px solid #33333f;border-radius:5px;padding:1px 6px;color:#e4e4e7}
+.B .live{margin:20px auto 0;max-width:460px;text-align:left;background:#15151c;border:1px solid #2a2a36;border-radius:12px;padding:12px 14px;font-size:13px;color:#d4d4d8}
+.B .live small{color:#8b5cf6;font-size:11px;display:block;margin-bottom:4px}
+.B .alt{display:flex;justify-content:center;gap:14px;margin-top:14px;font-size:12px;color:#71717a}
+.B .cta{display:inline-block;margin-top:14px;background:#fff;color:#0b0b10;font-weight:600;border-radius:999px;padding:9px 18px;font-size:13px}
+.B .gen{margin-top:26px}
+.B .gen h3{font-family:'Instrument Serif',serif;font-weight:400;font-size:26px;color:#fff}
+.B .stream{margin-top:14px;font-size:13px;color:#a1a1aa;background:#15151c;border:1px solid #2a2a36;border-radius:12px;padding:12px 14px}
+.B .stream .hl{color:#c4b5fd}
+.B .kan{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.B .col{background:#13131a;border:1px solid #23232d;border-radius:12px;padding:10px;min-height:120px}
+.B .col h5{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#a1a1aa;display:flex;justify-content:space-between;margin-bottom:8px}
+.B .tile{background:#1b1b24;border:1px solid #2a2a36;border-radius:9px;padding:8px 9px;font-size:12px;margin-bottom:7px;color:#e4e4e7}
+.B .tile .m{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
+.B .dec{border-left:3px solid #34d399}.B .act{border-left:3px solid #a78bfa}.B .q{border-left:3px solid #38bdf8}.B .risk{border-left:3px solid #fbbf24}
+.B .p1{background:#2e1065;color:#ddd6fe}.B .pu{background:#451a03;color:#fde68a}.B .pt{background:#0c4a6e;color:#bae6fd}
+.B .sk{background:linear-gradient(90deg,#1b1b24 0,#2a2a36 50%,#1b1b24 100%);background-size:400px 100%;animation:shimmer 1.3s infinite linear;border-radius:6px;height:10px;margin:6px 0}
+.B .prog{height:3px;background:#23232d;border-radius:2px;margin-top:10px;overflow:hidden}.B .prog i{display:block;height:100%;width:62%;background:linear-gradient(90deg,#7c3aed,#c4b5fd)}
+
+/* ---------- OPTION C: Split Studio (two pane, evidence-linked) ---------- */
+.C{background:#fffdf8}
+.C .scr{padding:0;display:grid;grid-template-columns:1fr 1.25fr;grid-template-rows:auto 1fr;min-height:420px}
+.C .pane{padding:18px}
+.C .left{border-right:1px solid #ece7dc;background:#fbf8f1}
+.C .bar{display:flex;align-items:center;gap:8px;padding:10px 18px;border-bottom:1px solid #ece7dc;font-size:12px;color:#57534e;grid-column:1/-1;background:#fffdf8}
+.C .bar b{color:#1c1917;font-size:14px}
+.C .bar .sp{margin-left:auto;display:flex;gap:6px}
+.C .bt{border:1px solid #d6d3d1;border-radius:7px;padding:3px 9px;font-size:12px;color:#292524;background:#fff}
+.C .bt.pri{background:#1c1917;color:#fff;border-color:#1c1917}
+.C h6{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#a8a29e;margin-bottom:8px}
+.C .seg{font-size:13px;color:#44403c;padding:5px 8px;border-radius:6px;display:flex;gap:8px}
+.C .seg em{font:400 10px 'Geist Mono',monospace;color:#a8a29e;font-style:normal;padding-top:3px;min-width:22px}
+.C .seg.on{background:#fef3c7;color:#1c1917;box-shadow:inset 3px 0 0 #f59e0b}
+.C .seg.ghost{color:#a8a29e}
+.C .mic{display:flex;align-items:center;gap:10px;border:1px dashed #d6d3d1;border-radius:10px;padding:10px;margin-top:10px;font-size:12px;color:#57534e}
+.C .mic .w{display:flex;gap:2px;align-items:center;height:18px}
+.C .mic .w s{width:3px;height:100%;background:#f59e0b;border-radius:2px;animation:bar .8s infinite;text-decoration:none;display:block}
+.C .mic .w s:nth-child(2n){animation-delay:.2s}.C .mic .w s:nth-child(3n){animation-delay:.4s}
+.C .item{display:grid;grid-template-columns:18px 1fr auto;gap:8px;align-items:start;padding:8px 6px;border-bottom:1px solid #f5f0e6;font-size:13px;color:#292524}
+.C .item.on{background:#fffbeb;border-radius:6px}
+.C .ic{width:18px;height:18px;border-radius:5px;display:grid;place-items:center;font-size:10px;font-weight:700;color:#fff}
+.C .d{background:#059669}.C .a{background:#1c1917}.C .q{background:#0284c7}.C .r{background:#d97706}
+.C .tag{font:400 10px 'Geist Mono',monospace;color:#a8a29e}
+.C .own{font-size:11px;color:#44403c;border-bottom:1px dotted #a8a29e}.C .unown{font-size:11px;color:#b45309;background:#fef3c7;padding:0 5px;border-radius:4px}
+.C .tl{display:flex;gap:4px;margin:4px 0 14px}.C .tl span{flex:1;height:4px;border-radius:2px;background:#e7e5e4}.C .tl .done{background:#1c1917}.C .tl .now{background:#f59e0b;animation:pulse 1s infinite}
+.C .skl{background:linear-gradient(90deg,#f5f0e6 0,#ece7dc 50%,#f5f0e6 100%);background-size:400px 100%;animation:shimmer 1.3s infinite linear;border-radius:5px;height:11px}
+.C .stats{display:flex;gap:12px;margin-bottom:10px}.C .stats div{font-size:11px;color:#78716c}.C .stats b{display:block;font-size:18px;color:#1c1917}
+.C .player{display:flex;align-items:center;gap:8px;background:#1c1917;color:#fff;border-radius:9px;padding:7px 10px;font-size:11px;margin-bottom:10px}
+.C .player .trk{flex:1;height:4px;background:#44403c;border-radius:2px;position:relative}.C .player .trk i{position:absolute;left:0;top:0;bottom:0;width:38%;background:#f59e0b;border-radius:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <h1>NoHands Log: three UI directions</h1>
+  <p>Mockups for the Wispr Flow hackathon build. Each option shows the same four moments of the demo loop: <b>Dictate</b> (Wispr Flow recap is the hero input), <b>Generating</b> (transcribe → extract, with live states), <b>Board</b> (decisions, actions, questions, risks, each linked to its source sentence) and <b>Share</b> (the zero-login link view). Same sample recap in all three so they compare fairly.</p>
+</header>
+<nav class="opts">
+  <a href="#option-a" data-o="a">A · Ledger</a>
+  <a href="#option-b" data-o="b">B · Voice Stage</a>
+  <a href="#option-c" data-o="c">C · Split Studio</a>
+  <a href="#compare" data-o="compare">Recommendation</a>
+</nav>
+
+<!-- ================= OPTION A ================= -->
+<section class="opt" id="sec-a">
+<div class="why">
+  <div><h2>A · Ledger</h2><p>The spec's design direction, done carefully. One calm column (max 768px), zinc neutrals, emerald / sky / amber accents. The board reads like a minutes document. Generation shows step labels with elapsed seconds, then items fade in section by section.</p></div>
+  <div><h3>Why it works</h3><ul><li>Lowest build risk: matches SPEC §6 and TASKS-B as written</li><li>Great at 375px and in dark mode</li><li>Reads well in a 1:45 screen recording</li></ul></div>
+  <div><h3>Trade-offs</h3><ul><li>Least memorable visually</li><li>Wispr Flow is a hint, not the show</li><li>Transcript sits below the board, so the "click → sentence lights up" moment needs a scroll</li></ul></div>
+</div>
+<div class="grid">
+ <div><div class="label"><span>1 · Dictate</span><span>Wispr text landing in the box</span></div>
+  <div class="frame A"><div class="chrome"><i></i><i></i><i></i><b>nohandslog.vercel.app</b></div><div class="scr">
+   <div class="hero"><h3>NoHands Log</h3><p>Speak your meeting recap. Get a decision board.</p><span class="wf">● Built for Wispr Flow</span></div>
+   <div class="card">
+    <div class="tabs"><span class="on">Dictate</span><span>Record</span><span>Upload</span></div>
+    <textarea readonly>Standup with Priya and Arjun. We decided dictate mode ships as the default input. Priya will deploy to Vercel by tonight. Someone needs to record the demo video. Are we showing Slack in the demo? Groq key still isn't tested in prod.</textarea>
+    <div class="hint">🎙 Hold your Wispr Flow hotkey and speak. <kbd>⌘</kbd><kbd>↵</kbd> to build</div>
+    <div class="chips"><span>Sample: standup</span><span>Sample: client call</span><span>Sample: sprint review</span><span>▶ Sample audio</span></div>
+    <div style="font-size:12px;color:#71717a;margin-top:10px">▸ Add details (optional)</div>
+    <div class="btn">Build board <small>⌘↵</small></div>
+   </div>
+  </div></div></div>
+
+ <div><div class="label"><span>2 · Generating</span><span>Step labels + elapsed time + streaming skeleton</span></div>
+  <div class="frame A"><div class="chrome"><i></i><i></i><i></i><b>nohandslog.vercel.app</b></div><div class="scr">
+   <div class="hero"><h3>NoHands Log</h3></div>
+   <div class="card"><ul class="steps">
+    <li><span class="dot ok">✓</span>Split into 5 sentences<span class="t">0.1s</span></li>
+    <li><span class="dot run"></span><b>Extracting decisions…</b><span class="t">2s</span></li>
+    <li style="color:#a1a1aa"><span class="dot wait"></span>Linking items to sentences<span class="t">–</span></li>
+   </ul></div>
+   <div class="card sec">
+    <h4><i style="background:#10b981"></i>Decisions</h4>
+    <div class="row new">Dictate mode ships as the default input<span class="meta"><span class="src">¶2</span></span></div>
+    <h4><i style="background:#18181b"></i>Actions</h4>
+    <div class="skel" style="width:80%;margin:8px"></div><div class="skel" style="width:60%;margin:8px"></div>
+    <h4><i style="background:#0ea5e9"></i>Open questions</h4>
+    <div class="skel" style="width:50%;margin:8px"></div>
+   </div>
+  </div></div></div>
+
+ <div><div class="label"><span>3 · Board</span><span>Click action → sentence highlights</span></div>
+  <div class="frame A"><div class="chrome"><i></i><i></i><i></i><b>nohandslog.vercel.app</b></div><div class="scr" style="padding-top:16px">
+   <div style="display:flex;justify-content:space-between;align-items:baseline"><b style="font-size:16px">Standup · 31 Oct</b><span style="font-size:12px;color:#71717a">Priya, Arjun · Dictated</span></div>
+   <div class="card sec" style="margin-top:10px">
+    <h4><i style="background:#10b981"></i>Decisions · 1</h4>
+    <div class="row">Dictate mode ships as the default input<span class="meta"><span class="src">¶2</span></span></div>
+    <h4><i style="background:#18181b"></i>Actions · 2</h4>
+    <div class="row sel">Deploy to Vercel<span class="meta"><span class="pill own">Priya ✎</span><span class="pill own">Tonight</span></span></div>
+    <div class="row">Record the demo video<span class="meta"><span class="pill un">Unassigned</span><span class="pill own">–</span></span></div>
+    <h4><i style="background:#0ea5e9"></i>Questions · 1</h4>
+    <div class="row">Are we showing Slack in the demo?</div>
+    <h4><i style="background:#f59e0b"></i>At risk · 1</h4>
+    <div class="row">Groq key not tested in prod</div>
+   </div>
+   <div class="tx">Standup with Priya and Arjun. We decided dictate mode ships as the default input. <mark>Priya will deploy to Vercel by tonight.</mark> Someone needs to record…</div>
+  </div></div></div>
+
+ <div><div class="label"><span>4 · Share</span><span>/m/&lt;slug&gt; in incognito, no login</span></div>
+  <div class="frame A"><div class="chrome"><i></i><i></i><i></i><b>nohandslog.vercel.app/m/zeJy0V…</b></div><div class="scr">
+   <div style="font-size:11px;color:#71717a">Shared board · read only</div>
+   <b style="font-size:18px">Standup · 31 Oct</b>
+   <div class="card sec">
+    <h4><i style="background:#10b981"></i>Decisions</h4><div class="row">Dictate mode ships as the default input</div>
+    <h4><i style="background:#18181b"></i>Actions</h4><div class="row">Deploy to Vercel<span class="meta"><span class="pill own">Priya</span></span></div><div class="row">Record the demo video<span class="meta"><span class="pill own">Arjun</span></span></div>
+   </div>
+   <div class="card" style="display:flex;gap:8px;align-items:center;font-size:12px">
+    <span class="mono" style="flex:1;color:#52525b;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">nohandslog.vercel.app/m/zeJy0VhT9…</span>
+    <span class="pill own" style="padding:5px 10px">Copy link</span><span class="pill own" style="padding:5px 10px">Markdown</span><span class="pill own" style="padding:5px 10px">Slack</span>
+   </div>
+   <div style="text-align:center;font-size:11px;color:#a1a1aa;margin-top:14px">Made with NoHands Log · spoken with Wispr Flow</div>
+  </div></div></div>
+</div>
+</section>
+
+<!-- ================= OPTION B ================= -->
+<section class="opt" id="sec-b">
+<div class="why">
+  <div><h2>B · Voice Stage</h2><p>Dark, cinematic, built for the demo video. The Wispr Flow moment is the hero: a glowing voice orb, live text appearing under it, then the board assembles as a three-column kanban while the model's reasoning streams in.</p></div>
+  <div><h3>Why it works</h3><ul><li>Strongest "No Hands" story for judges</li><li>Generation is visible and exciting, not a spinner</li><li>Kanban (Decided / To do / Open) scans fast</li></ul></div>
+  <div><h3>Trade-offs</h3><ul><li>Off-spec: needs new styling, more Track B time</li><li>Three columns collapse to tabs at 375px</li><li>Orb animation is decorative; Wispr types into a focused field, so the live box must be a real textarea</li></ul></div>
+</div>
+<div class="grid">
+ <div><div class="label"><span>1 · Dictate</span><span>Orb pulses while Wispr text arrives</span></div>
+  <div class="frame B"><div class="chrome"><i></i><i></i><i></i><b>nohandslog.vercel.app</b></div><div class="scr">
+   <div class="brand"><b>NoHands Log</b><span>Built for Wispr Flow</span></div>
+   <div class="stage">
+    <div class="orb"><s></s><s></s><s></s><s></s><s></s></div>
+    <h3>Just say what happened.</h3>
+    <p>Hold <kbd>fn</kbd> (your Wispr Flow hotkey) and speak your recap</p>
+    <div class="live"><small>● Listening via Wispr Flow</small>We decided dictate mode ships as the default input. Priya will deploy to Vercel by tonight. Someone needs to record the demo<span class="caret"></span></div>
+    <div class="cta">Build board ⌘↵</div>
+    <div class="alt"><span>● Record</span><span>↑ Upload</span><span>▶ Try sample</span></div>
+   </div>
+  </div></div></div>
+
+ <div><div class="label"><span>2 · Generating</span><span>Reasoning streams, tiles drop into columns</span></div>
+  <div class="frame B"><div class="chrome"><i></i><i></i><i></i><b>nohandslog.vercel.app</b></div><div class="scr">
+   <div class="brand"><b>NoHands Log</b><span class="mono">2.4s</span></div>
+   <div class="gen"><h3>Building your board…</h3>
+    <div class="prog"><i></i></div>
+    <div class="stream">Found <span class="hl">1 decision</span> in ¶2 · <span class="hl">owner "Priya"</span> for deploy, due "tonight" · "someone needs to" → <span class="hl">unassigned</span>…<span class="caret"></span></div>
+    <div class="kan">
+     <div class="col"><h5>Decided <span>1</span></h5><div class="tile dec" style="animation:in .5s both">Dictate mode is the default input</div></div>
+     <div class="col"><h5>To do <span>1</span></h5><div class="tile act" style="animation:in .5s .2s both">Deploy to Vercel<div class="m"><span class="pill p1">Priya</span></div></div><div class="sk" style="width:80%"></div><div class="sk" style="width:55%"></div></div>
+     <div class="col"><h5>Open <span>…</span></h5><div class="sk"></div><div class="sk" style="width:70%"></div></div>
+    </div>
+   </div>
+  </div></div></div>
+
+ <div><div class="label"><span>3 · Board</span><span>Hover a tile → quote pops from transcript</span></div>
+  <div class="frame B"><div class="chrome"><i></i><i></i><i></i><b>nohandslog.vercel.app</b></div><div class="scr">
+   <div class="brand"><b>Standup · 31 Oct</b><span>Copy link · Slack · .md</span></div>
+   <div class="kan">
+    <div class="col"><h5>Decided <span>1</span></h5><div class="tile dec">Dictate mode is the default input<div class="m"><span class="pill pt">¶2</span></div></div></div>
+    <div class="col"><h5>To do <span>2</span></h5>
+     <div class="tile act" style="outline:1px solid #a78bfa">Deploy to Vercel<div class="m"><span class="pill p1">Priya</span><span class="pill p1">Tonight</span></div></div>
+     <div class="tile act">Record the demo video<div class="m"><span class="pill pu">Unassigned</span></div></div></div>
+    <div class="col"><h5>Open <span>2</span></h5>
+     <div class="tile q">Show Slack in the demo?</div>
+     <div class="tile risk">Groq key untested in prod<div class="m"><span class="pill pu">At risk</span></div></div></div>
+   </div>
+   <div class="stream" style="margin-top:12px"><span style="color:#71717a">“</span><span class="hl">Priya will deploy to Vercel by tonight.</span><span style="color:#71717a">” · sentence 3 of 5</span></div>
+  </div></div></div>
+
+ <div><div class="label"><span>4 · Share</span><span>Same dark board, read only</span></div>
+  <div class="frame B"><div class="chrome"><i></i><i></i><i></i><b>nohandslog.vercel.app/m/zeJy0V…</b></div><div class="scr">
+   <div class="brand"><b>NoHands Log</b><span class="pill p1">Read only · no login</span></div>
+   <div class="gen" style="margin-top:16px"><h3>Standup · 31 Oct</h3><p style="color:#a1a1aa;font-size:12px">Priya, Arjun · spoken in 22s with Wispr Flow</p></div>
+   <div class="kan">
+    <div class="col"><h5>Decided</h5><div class="tile dec">Dictate mode is the default input</div></div>
+    <div class="col"><h5>To do</h5><div class="tile act">Deploy to Vercel<div class="m"><span class="pill p1">Priya</span></div></div><div class="tile act">Record demo video<div class="m"><span class="pill p1">Arjun</span></div></div></div>
+    <div class="col"><h5>Open</h5><div class="tile q">Show Slack in demo?</div></div>
+   </div>
+   <div style="text-align:center;margin-top:18px"><span class="cta" style="margin:0">Make your own board →</span></div>
+  </div></div></div>
+</div>
+</section>
+
+<!-- ================= OPTION C ================= -->
+<section class="opt" id="sec-c">
+<div class="why">
+  <div><h2>C · Split Studio</h2><p>A working tool: transcript on the left, board on the right, always both visible. Every item carries its evidence, and clicking one lights up the sentence (or seeks the audio) without scrolling. Warm paper tones with amber as the link color.</p></div>
+  <div><h3>Why it works</h3><ul><li>Best showcase of the "every item linked to its source" feature</li><li>Click → highlight / seek happens in one view, ideal for the demo beat at 0:50</li><li>Feels like a product people would use daily</li></ul></div>
+  <div><h3>Trade-offs</h3><ul><li>Breaks the spec's single 768px column; stacks on mobile</li><li>Denser, less dramatic on first impression</li><li>Needs layout work in page.tsx, not just restyling</li></ul></div>
+</div>
+<div class="grid">
+ <div><div class="label"><span>1 · Dictate</span><span>Sentences split live as Wispr types</span></div>
+  <div class="frame C"><div class="chrome"><i></i><i></i><i></i><b>nohandslog.vercel.app</b></div><div class="scr">
+   <div class="bar"><b>NoHands Log</b><span>· speak a recap, get a decision board</span><span class="sp"><span class="bt">Record</span><span class="bt">Upload</span><span class="bt pri">Build board ⌘↵</span></span></div>
+   <div class="pane left"><h6>Your recap · 5 sentences</h6>
+    <div class="seg"><em>¶1</em>Standup with Priya and Arjun.</div>
+    <div class="seg"><em>¶2</em>We decided dictate mode ships as the default input.</div>
+    <div class="seg"><em>¶3</em>Priya will deploy to Vercel by tonight.</div>
+    <div class="seg"><em>¶4</em>Someone needs to record the demo video.</div>
+    <div class="seg ghost"><em>¶5</em>Are we showing Slack in the<span class="caret"></span></div>
+    <div class="mic"><span class="w"><s></s><s></s><s></s><s></s><s></s><s></s></span>Wispr Flow is typing here. Hold <b>fn</b> to keep going.</div>
+   </div>
+   <div class="pane"><h6>Board preview</h6>
+    <div style="border:1px dashed #d6d3d1;border-radius:10px;padding:24px;text-align:center;color:#a8a29e;font-size:13px">Your decisions, actions, questions and risks will appear here, each linked to the sentence it came from.<div style="margin-top:12px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap"><span class="bt">Sample: standup</span><span class="bt">Sample: client call</span><span class="bt">▶ Sample audio</span></div></div>
+    <div style="margin-top:12px;font-size:12px;color:#78716c">▸ Details: title, attendees, kind, date</div>
+   </div>
+  </div></div></div>
+
+ <div><div class="label"><span>2 · Generating</span><span>Segmented progress + sentences being read</span></div>
+  <div class="frame C"><div class="chrome"><i></i><i></i><i></i><b>nohandslog.vercel.app</b></div><div class="scr">
+   <div class="bar"><b>NoHands Log</b><span class="sp"><span class="bt mono">Extracting · 2.1s</span></span></div>
+   <div class="pane left"><h6>Reading transcript</h6>
+    <div class="seg"><em>¶1</em>Standup with Priya and Arjun.</div>
+    <div class="seg"><em>¶2</em>We decided dictate mode ships as the default input.</div>
+    <div class="seg on"><em>¶3</em>Priya will deploy to Vercel by tonight.</div>
+    <div class="seg ghost"><em>¶4</em>Someone needs to record the demo video.</div>
+    <div class="seg ghost"><em>¶5</em>Are we showing Slack in the demo?</div>
+   </div>
+   <div class="pane"><h6>Transcribe · Extract · Link</h6>
+    <div class="tl"><span class="done"></span><span class="now"></span><span></span></div>
+    <div class="item" style="animation:in .4s both"><span class="ic d">D</span><span>Dictate mode ships as the default input</span><span class="tag">¶2</span></div>
+    <div class="item" style="animation:in .4s .2s both"><span class="ic a">A</span><span>Deploy to Vercel</span><span class="own">Priya</span></div>
+    <div class="item"><span class="ic" style="background:#e7e5e4"></span><span class="skl" style="width:70%;margin-top:4px"></span><span></span></div>
+    <div class="item"><span class="ic" style="background:#e7e5e4"></span><span class="skl" style="width:50%;margin-top:4px"></span><span></span></div>
+   </div>
+  </div></div></div>
+
+ <div><div class="label"><span>3 · Board</span><span>Audio mode: click ⏱ to seek, item ↔ sentence</span></div>
+  <div class="frame C"><div class="chrome"><i></i><i></i><i></i><b>nohandslog.vercel.app</b></div><div class="scr">
+   <div class="bar"><b>Standup · 31 Oct</b><span>Priya, Arjun</span><span class="sp"><span class="bt">Copy .md</span><span class="bt">Slack</span><span class="bt pri">Copy link</span></span></div>
+   <div class="pane left"><h6>Transcript · sample.mp3</h6>
+    <div class="player">▶ <span class="mono">0:19</span><span class="trk"><i></i></span><span class="mono">0:52</span></div>
+    <div class="seg"><em>0:04</em>We decided dictate mode ships as the default input.</div>
+    <div class="seg on"><em>0:19</em>Priya will deploy to Vercel by tonight.</div>
+    <div class="seg"><em>0:27</em>Someone needs to record the demo video.</div>
+    <div class="seg"><em>0:41</em>Groq key still isn't tested in prod.</div>
+   </div>
+   <div class="pane">
+    <div class="stats"><div><b>1</b>decision</div><div><b>2</b>actions</div><div><b>1</b>question</div><div><b style="color:#d97706">1</b>at risk</div></div>
+    <div class="item"><span class="ic d">D</span><span>Dictate mode ships as the default input</span><span class="tag">⏱0:04</span></div>
+    <div class="item on"><span class="ic a">A</span><span>Deploy to Vercel <span class="tag">· tonight</span></span><span><span class="own">Priya</span> <span class="tag">⏱0:19</span></span></div>
+    <div class="item"><span class="ic a">A</span><span>Record the demo video</span><span><span class="unown">Unassigned</span> <span class="tag">⏱0:27</span></span></div>
+    <div class="item"><span class="ic q">?</span><span>Are we showing Slack in the demo?</span><span class="tag">⏱0:35</span></div>
+    <div class="item"><span class="ic r">!</span><span>Groq key not tested in prod</span><span class="tag">⏱0:41</span></div>
+   </div>
+  </div></div></div>
+
+ <div><div class="label"><span>4 · Share</span><span>Read-only, evidence still clickable</span></div>
+  <div class="frame C"><div class="chrome"><i></i><i></i><i></i><b>nohandslog.vercel.app/m/zeJy0V…</b></div><div class="scr">
+   <div class="bar"><b>Standup · 31 Oct</b><span>shared board · no login needed</span><span class="sp"><span class="bt">Copy .md</span><span class="bt pri">Make your own</span></span></div>
+   <div class="pane left"><h6>Where it came from</h6>
+    <div class="seg"><em>¶2</em>We decided dictate mode ships as the default input.</div>
+    <div class="seg"><em>¶3</em>Priya will deploy to Vercel by tonight.</div>
+    <div class="seg on"><em>¶4</em>Someone needs to record the demo video.</div>
+    <div style="font-size:11px;color:#a8a29e;margin-top:14px">Spoken with Wispr Flow · built by NoHands Log</div>
+   </div>
+   <div class="pane">
+    <div class="item"><span class="ic d">D</span><span>Dictate mode ships as the default input</span><span class="tag">¶2</span></div>
+    <div class="item"><span class="ic a">A</span><span>Deploy to Vercel</span><span class="own">Priya</span></div>
+    <div class="item on"><span class="ic a">A</span><span>Record the demo video</span><span class="own">Arjun</span></div>
+    <div class="item"><span class="ic q">?</span><span>Are we showing Slack in the demo?</span><span class="tag">¶5</span></div>
+   </div>
+  </div></div></div>
+</div>
+</section>
+
+<!-- ================= RECOMMENDATION ================= -->
+<section class="opt" id="sec-compare">
+<div class="rec">
+  <h2>Recommendation: A as the base, with two pieces borrowed from B and C</h2>
+  <p><b>Ship Option A (Ledger)</b> because it is what SPEC §6 and TASKS-B already describe, so Track B can build it tonight without re-planning, and it holds up at 375px and in dark mode (both on the acceptance checklist).</p>
+  <p><b>Borrow from B:</b> the generating state. Replace a plain spinner with step labels plus items fading into their sections as they arrive, and a "Listening via Wispr Flow" badge on the textarea while text is being typed. It's CSS-only and makes the demo feel alive.</p>
+  <p><b>Borrow from C:</b> on screens ≥1024px, put the transcript panel beside the board (sticky) so the "click an action → sentence lights up / audio seeks" beat happens without scrolling. Below 1024px it stays the single column from A.</p>
+  <p style="color:#71717a">Pick B if you want maximum judge wow and have an hour of spare UI time. Pick C if you plan to keep building this after the hackathon as a daily tool.</p>
+</div>
+<div class="why" style="grid-template-columns:repeat(4,1fr);margin-top:18px">
+  <div><h3>&nbsp;</h3><p><b>Build effort</b><br><b>Demo impact</b><br><b>Source-link showcase</b><br><b>Mobile / dark</b></p></div>
+  <div><h3>A · Ledger</h3><p>Low<br>Medium<br>Medium<br>Strong</p></div>
+  <div><h3>B · Voice Stage</h3><p>High<br>Strong<br>Medium<br>Medium</p></div>
+  <div><h3>C · Split Studio</h3><p>Medium<br>Medium<br>Strong<br>Medium</p></div>
+</div>
+</section>
+</div>
+<script>
+function show(){var h=(location.hash||'#option-a').replace('#','');var o=h==='compare'?'compare':(h.split('-')[1]||'a');
+document.querySelectorAll('section.opt').forEach(function(s){s.classList.toggle('on',s.id==='sec-'+o)});
+document.querySelectorAll('nav.opts a').forEach(function(a){a.classList.toggle('on',a.dataset.o===o)});}
+addEventListener('hashchange',show);show();
+</script>
+</body>
+</html>
