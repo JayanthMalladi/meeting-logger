@@ -5,6 +5,8 @@ import { useState } from "react";
 type Props = {
   onAudio: (file: File, source: "sample") => void;
   disabled?: boolean;
+  /** True when the parent already holds the sample file. */
+  loaded?: boolean;
 };
 
 /**
@@ -12,8 +14,9 @@ type Props = {
  * finished board in one click, without recording or uploading anything.
  * No auto-load — the user clicks.
  */
-export default function SampleButton({ onAudio, disabled }: Props) {
-  const [state, setState] = useState<"idle" | "loading" | "ready" | "error">("idle");
+export default function SampleButton({ onAudio, disabled, loaded }: Props) {
+  const [localState, setState] = useState<"idle" | "loading" | "ready" | "error">("idle");
+  const state = loaded && localState === "idle" ? "ready" : localState;
 
   const load = async () => {
     setState("loading");
@@ -35,15 +38,15 @@ export default function SampleButton({ onAudio, disabled }: Props) {
       type="button"
       onClick={load}
       disabled={disabled || state === "loading" || state === "ready"}
-      className="self-start rounded-lg border border-zinc-300 px-3 py-1.5 text-xs font-medium text-zinc-600 transition hover:border-zinc-500 hover:text-zinc-900 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
+      className="rounded-full border border-dashed border-zinc-300 px-2.5 py-1 text-[11px] text-zinc-600 transition hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60 disabled:cursor-not-allowed disabled:opacity-60 dark:border-zinc-600 dark:text-zinc-400 dark:hover:bg-emerald-950 dark:hover:text-emerald-300"
     >
       {state === "loading"
         ? "Loading sample…"
         : state === "ready"
-          ? "Sample loaded ✓"
+          ? "▶ Sample audio loaded ✓"
           : state === "error"
             ? "Sample failed to load — try again"
-            : "Load sample standup (63s)"}
+            : "▶ Sample audio"}
     </button>
   );
 }

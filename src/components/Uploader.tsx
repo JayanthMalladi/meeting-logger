@@ -30,7 +30,7 @@ export default function Uploader({ onAudio, disabled }: Props) {
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-3">
+    <div className="flex flex-col gap-2">
       <div
         onDragOver={(e) => {
           e.preventDefault();
@@ -43,15 +43,23 @@ export default function Uploader({ onAudio, disabled }: Props) {
           if (!disabled) handleFile(e.dataTransfer?.files?.[0]);
         }}
         onClick={() => !disabled && inputRef.current?.click()}
-        className={`rounded-xl border-2 border-dashed px-6 py-3 text-sm transition ${
+        role="button"
+        tabIndex={disabled ? -1 : 0}
+        onKeyDown={(e) => {
+          if (!disabled && (e.key === "Enter" || e.key === " ")) {
+            e.preventDefault();
+            inputRef.current?.click();
+          }
+        }}
+        className={`rounded-xl border border-dashed px-4 py-5 text-center text-[13px] text-zinc-600 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60 dark:text-zinc-300 ${
           disabled
             ? "cursor-not-allowed border-zinc-300 opacity-50 dark:border-zinc-700"
             : dragging
-              ? "cursor-pointer border-zinc-900 bg-zinc-100 dark:bg-zinc-800"
-              : "cursor-pointer border-zinc-300 hover:border-zinc-500 dark:border-zinc-700 dark:hover:border-zinc-500"
+              ? "cursor-pointer border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40"
+              : "cursor-pointer border-zinc-300 bg-zinc-50 hover:border-emerald-500 dark:border-zinc-700 dark:bg-zinc-950 dark:hover:border-emerald-600"
         }`}
       >
-        {name ? `Loaded ${name} — tap to replace` : "Or drop a voice memo (webm, mp3, m4a, wav)"}
+        {name ? `Loaded ${name} · tap to replace` : "Drop a voice memo or tap to choose (webm, mp3, m4a, wav)"}
       </div>
       <input
         ref={inputRef}

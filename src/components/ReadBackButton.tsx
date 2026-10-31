@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { Extracted } from "@/lib/types";
+import { btnGhost } from "./ui";
 
 type Props = {
   extracted: Extracted;
@@ -60,9 +61,9 @@ export default function ReadBackButton({ extracted }: Props) {
     <button
       type="button"
       onClick={speaking ? stop : speak}
-      className="rounded-lg bg-zinc-100 px-2 py-1 text-xs hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+      className={btnGhost}
     >
-      {speaking ? "Stop" : "Read back"}
+      {speaking ? "■ Stop" : "🔊 Read back"}
     </button>
   );
 }

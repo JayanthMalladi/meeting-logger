@@ -1,11 +1,14 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { card } from "./ui";
 
 type Props = {
   audio: Blob | null;
   /** "mm:ss" — when set, jumps the player there and plays. */
   seekTo?: string | null;
+  /** Bumped on every selection so the same timestamp can be re-played. */
+  seekTick?: number;
 };
 
 /**
@@ -16,7 +19,7 @@ type Props = {
  * (B10: clicking a timestamp chip jumps the player there).
  * Renders nothing when `audio` is null.
  */
-export default function AudioPlayer({ audio, seekTo }: Props) {
+export default function AudioPlayer({ audio, seekTo, seekTick }: Props) {
   const ref = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -37,10 +40,14 @@ export default function AudioPlayer({ audio, seekTo }: Props) {
     const [m, s] = seekTo.split(":").map(Number);
     if (Number.isNaN(m) || Number.isNaN(s)) return;
     ref.current.currentTime = m * 60 + s;
-    void ref.current.play();
-  }, [seekTo]);
+    void ref.current.play().catch(() => {});
+  }, [seekTo, seekTick]);
 
   if (!audio) return null;
 
-  return <audio ref={ref} controls className="w-full rounded-lg border border-zinc-200 dark:border-zinc-800" />;
+  return (
+    <div className={`${card} !p-2.5`}>
+      <audio ref={ref} controls aria-label="Meeting audio" className="h-10 w-full" />
+    </div>
+  );
 }

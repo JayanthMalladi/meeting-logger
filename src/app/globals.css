@@ -1,26 +1,104 @@
 @import "tailwindcss";
 
+/* Ledger palette: zinc neutrals, emerald = decisions / primary accent,
+   sky = questions, amber = at risk / unassigned. Dark via prefers-color-scheme. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fafafa;
+  --foreground: #18181b;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #09090b;
+    --foreground: #f4f4f5;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+@keyframes ledger-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes ledger-shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: 200px 0;
+  }
+}
+@keyframes ledger-flash {
+  0% {
+    box-shadow: 0 0 0 0 rgb(16 185 129 / 0.55);
+  }
+  100% {
+    box-shadow: 0 0 0 10px rgb(16 185 129 / 0);
+  }
+}
+@keyframes ledger-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.fade-in {
+  animation: ledger-in 0.5s both;
+}
+.skel {
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #ececef 0, #dcdce1 50%, #ececef 100%);
+  background-size: 400px 100%;
+  animation: ledger-shimmer 1.3s infinite linear;
+}
+.flash {
+  animation: ledger-flash 1.5s ease-out;
+}
+.caret {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: currentColor;
+  vertical-align: -2px;
+  animation: ledger-blink 1s steps(1) infinite;
+}
+@media (prefers-color-scheme: dark) {
+  .skel {
+    background: linear-gradient(90deg, #27272a 0, #3f3f46 50%, #27272a 100%);
+    background-size: 400px 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fade-in,
+  .skel,
+  .flash,
+  .caret {
+    animation: none;
+  }
+}
+@media print {
+  body {
+    background: #fff;
+    color: #000;
+  }
 }

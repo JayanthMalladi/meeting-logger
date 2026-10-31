@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { KINDS } from "@/lib/types";
 import type { MeetingMeta } from "@/lib/types";
+import { field } from "./ui";
 
 type Props = {
   value: MeetingMeta;
@@ -23,22 +24,19 @@ export default function ContextForm({ value, onChange, disabled }: Props) {
   const set = <K extends keyof MeetingMeta>(k: K, v: MeetingMeta[K]) =>
     onChange({ ...value, [k]: v === "" ? undefined : v });
 
-  const field =
-    "rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100";
-
   return (
     <div>
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="text-sm text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+        className="rounded text-xs text-zinc-500 hover:text-zinc-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60 dark:text-zinc-400 dark:hover:text-zinc-100"
         aria-expanded={open}
       >
         {open ? "▾" : "▸"} Add details (optional)
       </button>
 
       {open && (
-        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="mt-2.5 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
           <input
             value={value.title ?? ""}
             onChange={(e) => set("title", e.target.value)}
