@@ -6,71 +6,68 @@ import { formatTs } from "@/lib/audio";
 
 type Props = {
   segments: Segment[];
-  activeTs?: string;
-  onReadBack?: () => void;
+  selectedSeg?: number | null; // scroll + 1.5s amber flash
+  onSelect(seg: number): void; // clicking a segment
+  withAudio?: boolean; // false on share page
 };
 
 /**
- * Transcript segments with click-to-highlight. The parent flashes a segment
- * when a board row's `ts` is clicked (via activeTs).
+ * B10: transcript segments, keyed by numeric seg index (`data-seg={s.i}`).
+ * Parent sets `selectedSeg`; the panel scrolls that segment into view and
+ * flashes it amber for 1.5 s. Clicking a segment calls `onSelect(s.i)`.
  */
-export default function TranscriptPanel({ segments, activeTs }: Props) {
+export default function TranscriptPanel({
+  segments,
+  selectedSeg,
+  onSelect,
+  withAudio,
+}: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [flash, setFlash] = useState<string | null>(null);
+  const [flash, setFlash] = useState<number | null>(null);
 
   useEffect(() => {
-    if (!activeTs || !containerRef.current) return;
-    const el = containerRef.current.querySelector(`[data-ts="${CSS.escape(activeTs)}"]`);
+    if (selectedSeg === null || selectedSeg === undefined || !containerRef.current)
+      return;
+    const el = containerRef.current.querySelector(
+      `[data-seg="${CSS.escape(String(selectedSeg))}"]`,
+    );
     if (el) {
       el.scrollIntoView({ behavior: "smooth", block: "center" });
-      setFlash(activeTs);
+      setFlash(selectedSeg);
       const t = window.setTimeout(() => setFlash(null), 1500);
       return () => window.clearTimeout(t);
     }
-  }, [activeTs]);
+  }, [selectedSeg]);
 
-  const readBack = () => {
-    if (!("speechSynthesis" in window)) return;
-    const utterance = new SpeechSynthesisUtterance(
-      segments.map((s) => s.text).join(" "),
-    );
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utterance);
-  };
+  // withAudio is part of the public props contract (share page hides the
+  // audio-related affordances); panel body is unchanged either way.
+  void withAudio;
 
   if (!segments.length) return null;
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-          Transcript ({segments.length} segments)
-        </h2>
-        <button
-          type="button"
-          onClick={readBack}
-          className="rounded bg-zinc-100 px-2 py-1 text-xs hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
-        >
-          ♪ Read back
-        </button>
-      </div>
+      <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+        Transcript ({segments.length} segments)
+      </h2>
       <div
         ref={containerRef}
         className="max-h-80 overflow-y-auto rounded-lg bg-zinc-50 p-3 text-sm dark:bg-zinc-900/50 dark:text-zinc-300"
       >
         <div className="flex flex-col gap-1">
-          {segments.map((s, i) => {
-            const ts = s.start !== undefined ? formatTs(s.start) : `#${s.i + 1}`;
-            const isFlash = flash === ts;
+          {segments.map((s) => {
+            const label = s.start !== undefined ? formatTs(s.start) : `¶ ${s.i + 1}`;
+            const isFlash = flash === s.i;
             return (
               <div
-                key={i}
-                data-ts={ts}
-                className={`flex gap-2 rounded px-1.5 py-0.5 transition ${
+                key={s.i}
+                data-seg={s.i}
+                onClick={() => onSelect(s.i)}
+                className={`flex cursor-pointer gap-2 rounded px-1.5 py-0.5 transition ${
                   isFlash ? "bg-amber-200 text-zinc-900 dark:bg-amber-400/40" : ""
                 }`}
               >
-                <span className="w-10 shrink-0 font-mono text-xs text-zinc-400">{ts}</span>
+                <span className="w-10 shrink-0 font-mono text-xs text-zinc-400">{label}</span>
                 <span>{s.text}</span>
               </div>
             );
