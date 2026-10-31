@@ -27,7 +27,7 @@ export default function Home() {
   const [activeTs, setActiveTs] = useState<string | undefined>(undefined);
   const fileRef = useRef<HTMLAudioElement>(null);
 
-  const onAudio = useCallback((blob: Blob, _mime: string) => {
+  const onAudio = useCallback((blob: Blob) => {
     setAudioBlob(blob);
     setStage("recorded");
     setError(null);

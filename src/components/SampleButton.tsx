@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 type Props = {
   onAudio: (blob: Blob, mime: string) => void;
@@ -10,6 +10,7 @@ type Props = {
 /**
  * Loads the bundled demo standup recording so a judge (or you) can see a
  * finished board in one click, without recording or uploading anything.
+ * No auto-load on mount (SPEC B7): the user must click.
  */
 export default function SampleButton({ onAudio, disabled }: Props) {
   const [state, setState] = useState<"idle" | "loading" | "ready" | "error">("idle");
@@ -27,12 +28,6 @@ export default function SampleButton({ onAudio, disabled }: Props) {
       setState("error");
     }
   };
-
-  useEffect(() => {
-    // auto-load the demo so the board is ready to process on first visit
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <button
