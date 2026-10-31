@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Recorder from "@/components/Recorder";
 import Uploader from "@/components/Uploader";
 import ContextForm from "@/components/ContextForm";
@@ -10,7 +10,7 @@ import ShareCard from "@/components/ShareCard";
 import SampleButton from "@/components/SampleButton";
 import { encodeShareUrl } from "@/lib/share";
 import type { MeetingMeta, Transcript } from "@/lib/types";
-import type { ParsedExtracted } from "@/lib/schema";
+import type { Extracted as ParsedExtracted } from "@/lib/types";
 
 type ExtractedResult = { result: ParsedExtracted; promptVersion: string };
 
@@ -81,7 +81,7 @@ export default function Home() {
 
   const postSlack = useCallback(async (webhookUrl: string) => {
     if (!extracted) return { ok: false, error: "Nothing to post yet." };
-    const shareUrl = encodeShareUrl(
+    const shareUrl = (await encodeShareUrl(
       {
         meta,
         extracted: extracted.result,
@@ -89,7 +89,7 @@ export default function Home() {
         promptVersion: extracted.promptVersion,
       },
       typeof window !== "undefined" ? window.location.origin : undefined,
-    ).url;
+    )).url;
     const res = await fetch("/api/slack", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -102,18 +102,14 @@ export default function Home() {
     });
     return res.json();
   }, [extracted, meta, transcript]);
-  const shareUrl =
-    stage === "done" && extracted && transcript
-      ? encodeShareUrl(
-          {
-            meta,
-            extracted: extracted.result,
-            transcript: { text: transcript.text, segments: transcript.segments },
-            promptVersion: extracted.promptVersion,
-          },
-          typeof window !== "undefined" ? window.location.origin : undefined,
-        ).url
-      : "";
+  const [shareUrl, setShareUrl] = useState("");
+  useEffect(() => {
+    if (stage !== "done" || !extracted || !transcript) return;
+    encodeShareUrl(
+      { meta, extracted: extracted.result, transcript, promptVersion: extracted.promptVersion },
+      window.location.origin,
+    ).then((r) => setShareUrl(r.url), () => setShareUrl(""));
+  }, [stage, extracted, transcript, meta]);
 
   const missingKey = error?.includes("GROQ_API_KEY");
 

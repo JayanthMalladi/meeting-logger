@@ -22,11 +22,7 @@ export function buildExtractMessages(
     .join("\n");
 
   const segmentIndex = segments
-    .map((s, i) => {
-      const m = Math.floor(s.start / 60);
-      const sec = Math.floor(s.start % 60);
-      return `${i}. [${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}] ${s.text}`;
-    })
+    .map((s) => `[${s.i}] ${s.text}`)
     .join("\n");
 
   const system = `You extract decisions, actions, and open questions from meeting transcripts.
@@ -38,23 +34,23 @@ Rules:
   * open question: something unresolved ("does anyone know if...?", "we need to figure out...")
 - For actions, capture owner and due date ONLY when actually stated in the transcript. Never invent owners or dates.
 - atRisk: up to 4 short, concrete flags — overdue items, blocked decisions, unowned actions.
-- Every item carries ts: the "mm:ss" timestamp of the segment where it was said, chosen from the segment list.
+- Every item carries seg: the integer index of the segment where it was said, from the segment list.
 - summary: at most 3 lines, no fluff.
 - Be conservative: if nothing is stated, return empty arrays. Do not pad.
 
 Return ONLY a JSON object with exactly these fields:
 {
   "summary": string,
-  "decisions": [{ "text": string, "ts": "mm:ss" }],
-  "actions": [{ "text": string, "owner"?: string, "due"?: string, "ts": "mm:ss" }],
-  "openQuestions": [{ "text": string, "ts": "mm:ss" }],
+  "decisions": [{ "text": string, "seg": number }],
+  "actions": [{ "text": string, "owner"?: string, "due"?: string, "seg": number }],
+  "openQuestions": [{ "text": string, "seg": number }],
   "atRisk": [string]
 }`;
 
   const user = `Meeting context:
 ${context || "(none provided)"}
 
-Transcript segments (index, [mm:ss], text):
+Transcript segments ([index] text):
 ${segmentIndex}
 
 Full transcript:

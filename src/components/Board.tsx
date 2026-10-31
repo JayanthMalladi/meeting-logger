@@ -1,7 +1,6 @@
 "use client";
 
-import type { ParsedExtracted } from "@/lib/schema";
-import type { MeetingMeta } from "@/lib/types";
+import type { Extracted as ParsedExtracted, MeetingMeta } from "@/lib/types";
 
 type Props = {
   extracted: ParsedExtracted;

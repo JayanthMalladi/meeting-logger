@@ -1,4 +1,6 @@
-import type { Transcript, Segment } from "./types";
+import type { Transcript } from "./types";
+import { audioFilename } from "./audio";
+import { indexSegments } from "./segments";
 
 /**
  * Thin Groq client. Only this file knows about the provider.
@@ -69,7 +71,7 @@ export async function transcribe(
 ): Promise<Transcript> {
   const { base, key, sttModel } = providerConfig();
   const form = new FormData();
-  form.append("file", audio, "audio.webm");
+  form.append("file", audio, audioFilename(audio.type, (audio as File).name));
   form.append("model", sttModel);
   form.append("response_format", "verbose_json");
   if (opts?.language) form.append("language", opts.language);
@@ -91,11 +93,9 @@ export async function transcribe(
     segments?: { start: number; end: number; text: string }[];
     duration?: number;
   };
-  const segments: Segment[] = (json.segments ?? []).map((s) => ({
-    start: s.start,
-    end: s.end,
-    text: s.text.trim(),
-  }));
+  const segments = indexSegments(
+    (json.segments ?? []).map((s) => ({ start: s.start, end: s.end, text: s.text.trim() })),
+  );
   return { text: json.text.trim(), segments, duration: json.duration };
 }
 
@@ -145,8 +145,3 @@ export async function chatJson<T>(messages: {
   }
 }
 
-export function formatTs(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-}

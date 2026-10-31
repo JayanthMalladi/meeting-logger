@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import type { ParsedExtracted } from "@/lib/schema";
-import type { MeetingMeta } from "@/lib/types";
+import type { Extracted as ParsedExtracted, MeetingMeta } from "@/lib/types";
 
 /**
  * POST /api/slack

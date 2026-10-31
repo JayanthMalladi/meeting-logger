@@ -2,7 +2,19 @@ import { NextResponse } from "next/server";
 import { ProviderError, chatJson, hasProviderKey } from "@/lib/groq";
 import { buildExtractMessages, promptVersion } from "@/lib/extractPrompt";
 import { validateExtracted, ParsedExtracted } from "@/lib/schema";
-import type { MeetingMeta, Segment } from "@/lib/types";
+import type { Extracted, MeetingMeta, Segment } from "@/lib/types";
+import { formatTs } from "@/lib/audio";
+import { isMock, mockExtract } from "@/lib/mock";
+
+/** Attach mm:ss from the referenced segment (audio only); drop out-of-range seg. */
+function attachTs(e: ParsedExtracted, segments: Segment[]): Extracted {
+  const fix = <T extends { seg?: number }>(it: T): T & { ts?: string } => {
+    const s = it.seg !== undefined ? segments[it.seg] : undefined;
+    if (!s) return { ...it, seg: undefined };
+    return s.start !== undefined ? { ...it, ts: formatTs(s.start) } : it;
+  };
+  return { ...e, decisions: e.decisions.map(fix), actions: e.actions.map(fix), openQuestions: e.openQuestions.map(fix) };
+}
 
 /**
  * POST /api/extract
@@ -10,6 +22,11 @@ import type { MeetingMeta, Segment } from "@/lib/types";
  * Out: { extracted: ParsedExtracted, promptVersion }
  */
 export async function POST(req: Request) {
+  if (isMock()) {
+    const b = await req.json().catch(() => null);
+    await new Promise((r) => setTimeout(r, 900));
+    return NextResponse.json({ extracted: mockExtract(Array.isArray(b?.segments) ? b.segments : []), promptVersion: "mock" });
+  }
   if (!hasProviderKey()) {
     return NextResponse.json(
       { error: "GROQ_API_KEY is not configured. Add it to .env.local to enable extraction." },
@@ -49,7 +66,7 @@ export async function POST(req: Request) {
       extracted = validateExtracted(rawRetry);
     }
 
-    return NextResponse.json({ extracted, promptVersion });
+    return NextResponse.json({ extracted: attachTs(extracted, body.segments as Segment[]), promptVersion });
   } catch (err) {
     if (err instanceof ProviderError) {
       return NextResponse.json(

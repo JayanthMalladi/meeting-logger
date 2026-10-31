@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { Segment } from "@/lib/types";
-import { formatTs } from "@/lib/groq";
+import { formatTs } from "@/lib/audio";
 
 type Props = {
   segments: Segment[];
@@ -60,7 +60,7 @@ export default function TranscriptPanel({ segments, activeTs }: Props) {
       >
         <div className="flex flex-col gap-1">
           {segments.map((s, i) => {
-            const ts = formatTs(s.start);
+            const ts = s.start !== undefined ? formatTs(s.start) : `#${s.i + 1}`;
             const isFlash = flash === ts;
             return (
               <div

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { ProviderError, transcribe, hasProviderKey } from "@/lib/groq";
+import { isMock, mockTranscript } from "@/lib/mock";
 
 /**
  * POST /api/transcribe
@@ -8,6 +9,10 @@ import { ProviderError, transcribe, hasProviderKey } from "@/lib/groq";
  * Out: Transcript { text, segments: [{start,end,text}], duration? }
  */
 export async function POST(req: Request) {
+  if (isMock()) {
+    await new Promise((r) => setTimeout(r, 600));
+    return NextResponse.json(mockTranscript());
+  }
   if (!hasProviderKey()) {
     return NextResponse.json(
       { error: "GROQ_API_KEY is not configured. Add it to .env.local to enable processing." },
