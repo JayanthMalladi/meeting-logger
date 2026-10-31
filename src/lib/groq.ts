@@ -62,6 +62,61 @@ export function hasProviderKey(): boolean {
 }
 
 /**
+ * HTTP timeout for provider calls (ms).
+ */
+const PROVIDER_TIMEOUT_MS = 45_000;
+/**
+ * Delay before the single retry on 429 / 5xx (ms).
+ */
+const RETRY_DELAY_MS = 1_500;
+
+function isRetriable(status: number): boolean {
+  return status === 429 || status >= 500 && status <= 599;
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Fetch with a 45s timeout and one retry after 1.5s on 429 / 5xx.
+ * Returns the final Response (ok or not); errors are read by the caller.
+ */
+async function fetchWithRetry(
+  input: string,
+  init: RequestInit,
+): Promise<Response> {
+  const signal = AbortSignal.timeout(PROVIDER_TIMEOUT_MS);
+  const doFetch = () => fetch(input, { ...init, signal });
+  let res = await doFetch();
+  if (isRetriable(res.status)) {
+    await delay(RETRY_DELAY_MS);
+    res = await doFetch();
+  }
+  return res;
+}
+
+/**
+ * Read a provider error body and surface the upstream message cleanly.
+ * Groq / OpenAI return {"error":{"message"}}; fall back to raw text slice.
+ */
+function providerErrorMessage(res: Response, body: string): string {
+  try {
+    const json = JSON.parse(body) as {
+      error?: { message?: string } | string;
+    };
+    const msg =
+      typeof json.error === "string"
+        ? json.error
+        : json.error?.message;
+    if (msg) return msg;
+  } catch {
+    // not JSON; fall through to raw slice
+  }
+  return body.slice(0, 300);
+}
+
+/**
  * Transcribe an audio Blob (webm/ogg/mp4/wav/m4a, ≤ ~50 MB) into a
  * Transcript with mm:ss-addressable segments.
  */
@@ -76,15 +131,18 @@ export async function transcribe(
   form.append("response_format", "verbose_json");
   if (opts?.language) form.append("language", opts.language);
 
-  const res = await fetch(`${base}/audio/transcriptions`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${key}` },
-    body: form,
-  });
+  const res = await fetchWithRetry(
+    `${base}/audio/transcriptions`,
+    {
+      method: "POST",
+      headers: { Authorization: `Bearer ${key}` },
+      body: form,
+    },
+  );
   if (!res.ok) {
     const text = await res.text().catch(() => "");
     throw new ProviderError(
-      `Upstream transcription failed (${res.status}): ${text.slice(0, 300)}`,
+      `Upstream transcription failed (${res.status}): ${providerErrorMessage(res, text)}`,
       res.status,
     );
   }
@@ -109,23 +167,26 @@ export async function chatJson<T>(messages: {
   content: string;
 }[]): Promise<T> {
   const { base, key, llmModel } = providerConfig();
-  const res = await fetch(`${base}/chat/completions`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${key}`,
-      "Content-Type": "application/json",
+  const res = await fetchWithRetry(
+    `${base}/chat/completions`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${key}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: llmModel,
+        messages,
+        response_format: { type: "json_object" },
+        temperature: 0,
+      }),
     },
-    body: JSON.stringify({
-      model: llmModel,
-      messages,
-      response_format: { type: "json_object" },
-      temperature: 0.1,
-    }),
-  });
+  );
   if (!res.ok) {
     const text = await res.text().catch(() => "");
     throw new ProviderError(
-      `Upstream LLM call failed (${res.status}): ${text.slice(0, 300)}`,
+      `Upstream LLM call failed (${res.status}): ${providerErrorMessage(res, text)}`,
       res.status,
     );
   }
