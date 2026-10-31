@@ -1,4 +1,4 @@
-# NoHands Log (meeting-logger)
+# Gist (meeting-logger)
 
 Speak a meeting recap through [Wispr Flow](https://wisprflow.ai) (or record / upload audio) and get a finished **decision board**: decisions, actions with owners and due dates, open questions, and at-risk flags — every item linked to the sentence or audio moment it came from, shareable through one zero-signup link.
 

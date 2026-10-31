@@ -100,7 +100,7 @@ export default function ShareCard({ shareUrl, truncated, onCopyMarkdown, onSlack
       )}
 
       <details className="group">
-        <summary className="cursor-pointer rounded text-xs text-zinc-500 hover:text-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF]/60 dark:hover:text-zinc-300">
+        <summary className="cursor-pointer rounded text-xs text-zinc-500 hover:text-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D83995]/60 dark:hover:text-zinc-300">
           Post to Slack
         </summary>
         <div className="mt-2 flex flex-col gap-2">
@@ -122,7 +122,7 @@ export default function ShareCard({ shareUrl, truncated, onCopyMarkdown, onSlack
             <p
               className={
                 slackMsg.ok
-                  ? "text-sm text-[#6E56CF] dark:text-[#a898f0]"
+                  ? "text-sm text-[#D83995] dark:text-[#F07AB8]"
                   : "text-sm text-red-600 dark:text-red-400"
               }
             >

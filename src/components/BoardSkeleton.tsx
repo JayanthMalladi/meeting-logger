@@ -4,8 +4,8 @@ import { card, sectionHeading } from "./ui";
 export default function BoardSkeleton() {
   const sections: { dot: string; label: string; rows: string[] }[] = [
     { dot: "bg-[#8fd6a8]", label: "Decisions", rows: ["80%", "55%"] },
-    { dot: "bg-[#6E56CF]", label: "Actions", rows: ["70%", "85%", "60%"] },
-    { dot: "bg-[#C9B8FF]", label: "Open questions", rows: ["50%", "65%"] },
+    { dot: "bg-[#D83995]", label: "Actions", rows: ["70%", "85%", "60%"] },
+    { dot: "bg-[#7FD0EE]", label: "Open questions", rows: ["50%", "65%"] },
   ];
   return (
     <div className={`${card} flex flex-col gap-6`} aria-hidden>

@@ -24,17 +24,17 @@ export default function ProgressSteps({ steps }: { steps: Step[] }) {
               s.status === "wait"
                 ? "bg-white/40 text-zinc-400 dark:bg-white/[0.03] dark:text-zinc-500"
                 : s.status === "run"
-                  ? "bg-white text-zinc-900 shadow-sm dark:bg-[#17161C] dark:text-zinc-50"
+                  ? "bg-white text-zinc-900 shadow-sm dark:bg-[#0B2230] dark:text-zinc-50"
                   : "bg-white/70 text-zinc-800 dark:bg-white/[0.06] dark:text-zinc-100"
             }`}
           >
             {s.status === "done" && (
-              <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-[#6E56CF] text-[11px] text-white" aria-hidden>
+              <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-[#D83995] text-[11px] text-white" aria-hidden>
                 ✓
               </span>
             )}
             {s.status === "run" && (
-              <span className="h-5 w-5 shrink-0 animate-spin rounded-full border-2 border-[#6E56CF] border-t-transparent" aria-hidden />
+              <span className="h-5 w-5 shrink-0 animate-spin rounded-full border-2 border-[#D83995] border-t-transparent" aria-hidden />
             )}
             {s.status === "wait" && (
               <span className="h-5 w-5 shrink-0 rounded-full border-2 border-black/10 dark:border-white/15" aria-hidden />
