@@ -66,8 +66,8 @@ export default function InputTabs({ active, onChange }: Props) {
             aria-selected={isActive}
             tabIndex={isActive ? 0 : -1}
             onClick={() => onChange(tab.id)}
-            className={`rounded-full px-4 py-1.5 text-[13px] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF]/60 ${
-              isActive ? "bg-white font-semibold text-zinc-900 shadow-sm dark:bg-[#2a2833] dark:text-zinc-50" : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
+            className={`rounded-full px-4 py-1.5 text-[13px] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D83995]/60 ${
+              isActive ? "bg-white font-semibold text-zinc-900 shadow-sm dark:bg-[#12384C] dark:text-zinc-50" : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
             }`}
           >
             {tab.label}

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { BRAND } from "@/lib/brand";
 import type { Extracted as ParsedExtracted, MeetingMeta } from "@/lib/types";
 
 /** Slack's incoming webhooks live under exactly this prefix. */
@@ -69,7 +70,7 @@ export async function POST(req: Request) {
     for (const r of extracted.atRisk) lines.push(`⚑ ${r}`);
   }
   if (shareUrl) lines.push(`Full digest: ${shareUrl}`);
-  lines.push("Made with NoHands Log");
+  lines.push(`Made with ${BRAND.name}`);
 
   // ---- Block Kit
   const mrkdwn = (text: string): SlackField => ({ type: "mrkdwn", text });
@@ -143,7 +144,7 @@ export async function POST(req: Request) {
 
   blocks.push({
     type: "context",
-    elements: [{ type: "plain_text", text: "Made with NoHands Log" }],
+    elements: [{ type: "plain_text", text: `Made with ${BRAND.name}` }],
   });
 
   const payload = {

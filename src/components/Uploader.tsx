@@ -51,12 +51,12 @@ export default function Uploader({ onAudio, disabled }: Props) {
             inputRef.current?.click();
           }
         }}
-        className={`rounded-3xl border border-dashed px-4 py-10 text-center text-[14px] text-zinc-600 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF]/60 dark:text-zinc-300 ${
+        className={`rounded-3xl border border-dashed px-4 py-10 text-center text-[14px] text-zinc-600 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D83995]/60 dark:text-zinc-300 ${
           disabled
             ? "cursor-not-allowed border-zinc-300 opacity-50 dark:border-zinc-700"
             : dragging
-              ? "cursor-pointer border-[#6E56CF] bg-[#ece6ff]/60 dark:bg-[#2a2542]/60"
-              : "cursor-pointer border-black/15 bg-black/[0.02] hover:border-[#6E56CF] dark:border-white/15 dark:bg-white/[0.03]"
+              ? "cursor-pointer border-[#D83995] bg-[#DEF0F7]/60 dark:bg-[#0F3A4F]/60"
+              : "cursor-pointer border-black/15 bg-black/[0.02] hover:border-[#D83995] dark:border-white/15 dark:bg-white/[0.03]"
         }`}
       >
         {name ? `Loaded ${name} · tap to replace` : "Drop a voice memo or tap to choose (webm, mp3, m4a, wav)"}

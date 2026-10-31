@@ -12,6 +12,7 @@ import type {
   SlackResponse,
   Transcript,
 } from "@/lib/types";
+import { BRAND } from "@/lib/brand";
 import { splitSentences } from "@/lib/segments";
 import { audioFilename, formatTs, MAX_UPLOAD_BYTES } from "@/lib/audio";
 import { encodeShareUrl } from "@/lib/share";
@@ -338,25 +339,25 @@ export default function Home() {
         >
           <div className={showResults ? "" : "w-full text-center"}>
             <div className={`flex items-center gap-2 ${showResults ? "" : "justify-center"}`}>
-              <span aria-hidden className="grid h-7 w-7 place-items-center rounded-full bg-[#14131A] dark:bg-[#F6F3EE]">
+              <span aria-hidden className="grid h-7 w-7 place-items-center rounded-full bg-[#0593C6]">
                 <span className="wave" data-active="false" style={{ height: 12, gap: 2 }}>
-                  <span style={{ width: 2, background: "#C9B8FF" }} />
-                  <span style={{ width: 2, background: "#FFD3B8" }} />
-                  <span style={{ width: 2, background: "#BFE3FF" }} />
+                  <span style={{ width: 2, background: "#FCFFFF" }} />
+                  <span style={{ width: 2, background: "#FCFFFF" }} />
+                  <span style={{ width: 2, background: "#FCFFFF" }} />
                 </span>
               </span>
-              <span className="text-[15px] font-semibold tracking-[-0.01em]">NoHands Log</span>
-              <span className="rounded-full bg-[#ece6ff] px-2.5 py-0.5 text-[11px] font-medium text-[#4b3a9a] dark:bg-[#2a2542] dark:text-[#cfc4ff]">
+              <span className="text-[15px] font-semibold tracking-[-0.01em]">{BRAND.name}</span>
+              <span className="rounded-full bg-[#DEF0F7] px-2.5 py-0.5 text-[11px] font-medium text-[#04597B] dark:bg-[#0F3A4F] dark:text-[#9ADAF2]">
                 Built for Wispr Flow
               </span>
             </div>
             {!showResults && (
               <>
-                <h1 className="mx-auto mt-8 max-w-3xl text-balance font-serif text-[44px] leading-[1.02] tracking-[-0.02em] text-zinc-900 sm:text-[76px] dark:text-zinc-50">
-                  Say what happened. <em className="text-[#6E56CF] dark:text-[#a898f0]">Get the board.</em>
+                <h1 className="mx-auto mt-8 max-w-3xl text-balance font-serif text-[44px] leading-[1.02] tracking-[-0.02em] text-[#0A2533] sm:text-[76px] dark:text-[#EAF6FB]">
+                  Say what happened. <em className="text-[#D83995] dark:text-[#F07AB8]">Get the board.</em>
                 </h1>
                 <p className="mx-auto mt-5 max-w-xl text-[15px] leading-relaxed text-zinc-600 sm:text-base dark:text-zinc-400">
-                  Speak your meeting recap with Wispr Flow. NoHands Log turns it into decisions, owners and next steps.
+                  Speak your meeting recap with Wispr Flow. {BRAND.name} turns it into decisions, owners and next steps.
                 </p>
               </>
             )}
@@ -436,7 +437,7 @@ export default function Home() {
           </div>
 
           {/* Floating pill bar: waveform + hint + build */}
-          <div className="mt-4 flex items-center gap-3 rounded-full border border-black/[0.06] bg-[#F6F3EE] py-2 pl-5 pr-2 shadow-[0_6px_24px_-10px_rgba(40,30,80,0.25)] dark:border-white/10 dark:bg-[#0E0D12]">
+          <div className="mt-4 flex items-center gap-3 rounded-full border border-black/[0.06] bg-[#FCFFFF] py-2 pl-5 pr-2 shadow-[0_6px_24px_-10px_rgba(10,37,51,0.25)] dark:border-white/10 dark:bg-[#04141C]">
             <span className="wave" data-active={dictating || recording ? "true" : "false"} aria-hidden>
               {Array.from({ length: 14 }, (_, i) => (
                 <span
@@ -455,10 +456,10 @@ export default function Home() {
               type="button"
               onClick={build}
               disabled={!canBuild}
-              className="flex shrink-0 items-center gap-2 rounded-full bg-[#14131A] px-5 py-2.5 text-[13px] font-semibold text-white transition hover:bg-[#2b2938] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-[#F6F3EE] dark:text-[#14131A] dark:hover:bg-white"
+              className="flex shrink-0 items-center gap-2 rounded-full bg-[#D83995] px-5 py-2.5 text-base font-bold text-[#1F0A16] transition hover:bg-[#E255A8] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D83995] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40"
             >
               <span>{hasBoard ? "Rebuild board" : "Build board"}</span>
-              <kbd className={`${kbd} hidden !border-white/20 !bg-white/10 sm:inline dark:!border-black/20 dark:!bg-black/10`}>⌘↵</kbd>
+              <kbd className={`${kbd} hidden !border-black/20 !bg-black/10 sm:inline`}>⌘↵</kbd>
             </button>
           </div>
         </section>

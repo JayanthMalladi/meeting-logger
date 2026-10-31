@@ -126,7 +126,7 @@ export default function Recorder({ onAudio, onRecording, disabled }: Props) {
         disabled={disabled || (done && !recording)}
         aria-label={recording ? "Stop recording" : "Start recording"}
         className={`flex h-14 w-14 items-center justify-center rounded-full text-white transition disabled:cursor-not-allowed disabled:opacity-40 ${
-          recording ? "animate-pulse bg-red-600 hover:bg-red-700" : "bg-[#14131A] hover:bg-[#2b2938] dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+          recording ? "animate-pulse bg-red-600 hover:bg-red-700" : "bg-[#0A2533] hover:bg-[#0A3A52] dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
         }`}
       >
         {recording ? <span className="block h-4 w-4 rounded-sm bg-white" /> : <span className="block h-5 w-3 rounded-sm bg-white dark:bg-zinc-900" />}

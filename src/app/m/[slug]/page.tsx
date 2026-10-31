@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { BRAND } from "@/lib/brand";
 import { decodeShareSlug, type SharePayload } from "@/lib/share";
 import { toMarkdown } from "@/lib/markdown";
 import Board from "@/components/Board";
@@ -71,7 +72,7 @@ function ShareViewInner() {
         <div className={`${card} flex flex-col items-start gap-3`}>
           <h1 className="font-serif text-3xl">This link doesn&apos;t open</h1>
           <p className="text-[13px] text-zinc-600 dark:text-zinc-400">
-            It is malformed, cut off, or was made by an older version of NoHands Log.
+            It is malformed, cut off, or was made by an older version of {BRAND.name}.
           </p>
           <Link href="/" className={`${btnPrimary} print:hidden`}>
             Make your own board
@@ -95,7 +96,7 @@ function ShareViewInner() {
       <header className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-[11px] text-zinc-500 dark:text-zinc-400">
           <Link href="/" className="text-[15px] font-semibold tracking-[-0.01em] text-zinc-900 hover:underline dark:text-zinc-50">
-            NoHands Log
+            {BRAND.name}
           </Link>
           <span aria-hidden>·</span>
           <span>Shared board · read only</span>
@@ -107,7 +108,7 @@ function ShareViewInner() {
           <button type="button" onClick={() => copy("md")} className={btnGhost}>
             {copied === "md" ? "Markdown copied ✓" : "Copy as Markdown"}
           </button>
-          <Link href="/" className={`${btnGhost} !border-transparent !bg-[#14131A] !text-white hover:!bg-[#2b2938] dark:!bg-[#F6F3EE] dark:!text-[#14131A]`}>
+          <Link href="/" className={`${btnGhost} !border-transparent !bg-[#D83995] !font-bold !text-[#1F0A16] hover:!bg-[#E255A8]`}>
             Make your own board
           </Link>
         </div>
@@ -151,7 +152,7 @@ function ShareViewInner() {
       </div>
 
       <footer className="mt-2 text-center text-[11px] text-zinc-400 dark:text-zinc-500">
-        Made with NoHands Log · spoken with Wispr Flow
+        Made with {BRAND.name} · spoken with Wispr Flow
       </footer>
     </div>
   );

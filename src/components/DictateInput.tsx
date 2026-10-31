@@ -100,9 +100,9 @@ export default function DictateInput({
           {listening && (
             <span
               role="status"
-              className="pointer-events-none absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-[#ece6ff] px-2.5 py-0.5 text-[11px] font-medium text-[#4b3a9a] dark:bg-[#2a2542] dark:text-[#cfc4ff]"
+              className="pointer-events-none absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-[#DEF0F7] px-2.5 py-0.5 text-[11px] font-medium text-[#04597B] dark:bg-[#0F3A4F] dark:text-[#9ADAF2]"
             >
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#6E56CF]" />
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#D83995]" />
               Listening via Wispr Flow
             </span>
           )}
@@ -123,7 +123,7 @@ export default function DictateInput({
               type="button"
               onClick={() => onSample(sample)}
               disabled={disabled}
-              className="rounded-full bg-[#ece6ff] px-3 py-1 text-xs font-medium text-[#4b3a9a] transition hover:bg-[#ddd3ff] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF]/60 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#2a2542] dark:text-[#cfc4ff] dark:hover:bg-[#352e55]"
+              className="rounded-full bg-[#DEF0F7] px-3 py-1 text-xs font-medium text-[#04597B] transition hover:bg-[#C6E6F3] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D83995]/60 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#0F3A4F] dark:text-[#9ADAF2] dark:hover:bg-[#352e55]"
             >
               Sample: {sample.label.toLowerCase()}
             </button>

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import "./globals.css";
+import { BRAND } from "@/lib/brand";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,11 +21,11 @@ const instrumentSerif = Instrument_Serif({
 });
 
 export const metadata: Metadata = {
-  title: "NoHands Log: speak a recap, get a decision board",
+  title: `${BRAND.name}: speak a recap, get a decision board`,
   description:
     "One spoken paragraph per meeting → a finished decision board of decisions, actions, owners and open questions — shareable with one zero-signup link.",
   openGraph: {
-    title: "NoHands Log: speak a recap, get a decision board",
+    title: `${BRAND.name}: speak a recap, get a decision board`,
     description:
       "One spoken paragraph per meeting → a finished decision board of decisions, actions, owners and open questions — shareable with one zero-signup link.",
     type: "website",
@@ -33,8 +34,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#F6F3EE" },
-    { media: "(prefers-color-scheme: dark)", color: "#0E0D12" },
+    { media: "(prefers-color-scheme: light)", color: "#FCFFFF" },
+    { media: "(prefers-color-scheme: dark)", color: "#04141C" },
   ],
   colorScheme: "dark light",
 };

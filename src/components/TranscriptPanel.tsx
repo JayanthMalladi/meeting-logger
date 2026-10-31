@@ -91,7 +91,7 @@ export default function TranscriptPanel({
                 onClick={() => onSelect(s.i)}
                 className={`flex cursor-pointer gap-2 rounded-xl px-2.5 py-1.5 text-[13px] leading-relaxed transition-colors ${
                   selected
-                    ? "bg-[#ece6ff] text-[#2d2166] shadow-[inset_3px_0_0_#6E56CF] dark:bg-[#2a2542] dark:text-[#e6e0ff]"
+                    ? "bg-[#DEF0F7] text-[#04384F] shadow-[inset_3px_0_0_#D83995] dark:bg-[#0F3A4F] dark:text-[#EAF6FB]"
                     : "text-zinc-600 hover:bg-black/[0.04] dark:text-zinc-300 dark:hover:bg-white/[0.06]"
                 } ${flashing ? "flash" : ""}`}
               >
