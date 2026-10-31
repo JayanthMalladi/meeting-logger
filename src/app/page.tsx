@@ -7,9 +7,12 @@ import ContextForm from "@/components/ContextForm";
 import Board from "@/components/Board";
 import TranscriptPanel from "@/components/TranscriptPanel";
 import ShareCard from "@/components/ShareCard";
+import SampleButton from "@/components/SampleButton";
 import { encodeShareUrl } from "@/lib/share";
 import type { MeetingMeta, Transcript } from "@/lib/types";
 import type { ParsedExtracted } from "@/lib/schema";
+
+type ExtractedResult = { result: ParsedExtracted; promptVersion: string };
 
 type Stage = "idle" | "recorded" | "transcribed" | "extracted" | "done" | "error";
 
@@ -20,7 +23,7 @@ export default function Home() {
   const [meta, setMeta] = useState<MeetingMeta>({});
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [transcript, setTranscript] = useState<Transcript | null>(null);
-  const [extracted, setExtracted] = useState<{ result: ParsedExtracted; promptVersion: string } | null>(null);
+  const [extracted, setExtracted] = useState<ExtractedResult | null>(null);
   const [activeTs, setActiveTs] = useState<string | undefined>(undefined);
   const fileRef = useRef<HTMLAudioElement>(null);
 
@@ -46,6 +49,7 @@ export default function Home() {
       fd.append("title", meta.title ?? "");
       fd.append("attendees", meta.attendees ?? "");
       fd.append("kind", meta.kind ?? "");
+      fd.append("source", "upload");
       const tRes = await fetch("/api/transcribe", { method: "POST", body: fd });
       const tJson = await tRes.json();
       if (!tRes.ok) throw new Error(tJson.error ?? `Transcription failed (${tRes.status})`);
@@ -65,7 +69,7 @@ export default function Home() {
       });
       const eJson = await eRes.json();
       if (!eRes.ok) throw new Error(eJson.error ?? `Extraction failed (${eRes.status})`);
-      setExtracted(eJson as { result: ParsedExtracted; promptVersion: string });
+      setExtracted({ result: eJson.extracted, promptVersion: eJson.promptVersion });
       setStage("done");
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -98,7 +102,6 @@ export default function Home() {
     });
     return res.json();
   }, [extracted, meta, transcript]);
-
   const shareUrl =
     stage === "done" && extracted && transcript
       ? encodeShareUrl(
@@ -136,7 +139,10 @@ export default function Home() {
         <audio ref={fileRef} controls className="hidden" />
 
         <section className="flex flex-col gap-4">
-          <Recorder onAudio={onAudio} disabled={busy} />
+          <div className="flex flex-col gap-2">
+            <Recorder onAudio={onAudio} disabled={busy} />
+            <SampleButton onAudio={onAudio} disabled={busy} />
+          </div>
           <Uploader onAudio={onAudio} disabled={busy} />
           <ContextForm onSubmit={(m) => setMeta(m)} disabled={busy} />
         </section>
