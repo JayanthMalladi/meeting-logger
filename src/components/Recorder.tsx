@@ -1,52 +1,87 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { RECORDER_BITS_PER_SECOND, formatTs } from "@/lib/audio";
 
 type Props = {
-  onAudio: (blob: Blob, mime: string) => void;
+  onAudio: (blob: Blob, mime: string, source: "recorded") => void;
   disabled?: boolean;
 };
 
+/** 15:00 hard cap — anything longer would exceed MAX_UPLOAD_BYTES at 32 kbps. */
+const MAX_SECONDS = 15 * 60;
+
+const MIME_CANDIDATES = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg"];
+
+function pickMimeType(): string | undefined {
+  if (typeof MediaRecorder === "undefined") return undefined;
+  for (const mime of MIME_CANDIDATES) {
+    if (MediaRecorder.isTypeSupported(mime)) return mime;
+  }
+  return undefined;
+}
+
 /**
- * MediaRecorder wrapper: record/stop + live timer, emits a Blob.
- * No third-party recorder lib. webm on Chrome, mp4 fallback on Safari.
+ * MediaRecorder wrapper: record/stop + live mm:ss timer, 15-minute auto-stop,
+ * emits a Blob on stop. No third-party recorder lib.
  */
 export default function Recorder({ onAudio, disabled }: Props) {
   const [recording, setRecording] = useState(false);
   const [seconds, setSeconds] = useState(0);
+  const [done, setDone] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const mimeRef = useRef<string | undefined>(undefined);
   const timerRef = useRef<number | null>(null);
+  const emittedRef = useRef(false);
+  const onAudioRef = useRef(onAudio);
+  useEffect(() => {
+    onAudioRef.current = onAudio;
+  }, [onAudio]);
 
+  // Stop any in-flight recording on unmount.
   useEffect(
     () => () => {
       if (timerRef.current !== null) window.clearInterval(timerRef.current);
+      if (recorderRef.current && recorderRef.current.state === "recording") {
+        recorderRef.current.stop();
+        recorderRef.current = null;
+      }
     },
     [],
   );
 
-  const pickMimeType = () => {
-    const candidates = ["audio/webm", "audio/mp4"];
-    for (const c of candidates) {
-      if (typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported(c)) return c;
+  const stopTimer = () => {
+    if (timerRef.current !== null) {
+      window.clearInterval(timerRef.current);
+      timerRef.current = null;
     }
-    return "";
   };
 
   const start = useCallback(async () => {
+    setError(null);
+    setDone(false);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mime = pickMimeType();
-      const rec = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
+      const rec = new MediaRecorder(stream, {
+        ...(mime ? { mimeType: mime } : {}),
+        audioBitsPerSecond: RECORDER_BITS_PER_SECOND,
+      });
+      mimeRef.current = mime;
       chunksRef.current = [];
+      emittedRef.current = false;
       rec.ondataavailable = (e) => {
         if (e.data.size > 0) chunksRef.current.push(e.data);
       };
       rec.onstop = () => {
-        const type = rec.mimeType || "audio/webm";
+        if (emittedRef.current) return;
+        emittedRef.current = true;
+        const type = mimeRef.current ?? rec.mimeType ?? "audio/webm";
         const blob = new Blob(chunksRef.current, { type });
         stream.getTracks().forEach((t) => t.stop());
-        onAudio(blob, type);
+        onAudioRef.current(blob, type, "recorded");
       };
       rec.start();
       recorderRef.current = rec;
@@ -54,42 +89,45 @@ export default function Recorder({ onAudio, disabled }: Props) {
       setSeconds(0);
       timerRef.current = window.setInterval(() => setSeconds((s) => s + 1), 1000);
     } catch (err) {
-      alert("Could not access the microphone: " + String(err));
+      stopTimer();
+      const denied =
+        err instanceof DOMException && (err.name === "NotAllowedError" || err.name === "SecurityError");
+      setError(denied ? "Microphone access was denied. Allow the mic and try again." : "Could not start recording.");
     }
-  }, [onAudio]);
-
-  const stop = useCallback(() => {
-    recorderRef.current?.stop();
-    if (timerRef.current !== null) window.clearInterval(timerRef.current);
-    setRecording(false);
   }, []);
 
-  const mm = String(Math.floor(seconds / 60)).padStart(2, "0");
-  const ss = String(seconds % 60).padStart(2, "0");
+  const stop = useCallback(() => {
+    const rec = recorderRef.current;
+    if (!rec || rec.state !== "recording") return;
+    stopTimer();
+    setRecording(false);
+    rec.stop();
+    recorderRef.current = null;
+    setDone(true);
+  }, []);
+
+  // Auto-stop at 15:00.
+  useEffect(() => {
+    if (recording && seconds >= MAX_SECONDS) stop();
+  }, [recording, seconds, stop]);
 
   return (
-    <div className="flex items-center gap-3">
-      {recording ? (
-        <button
-          type="button"
-          onClick={stop}
-          className="flex h-14 w-14 items-center justify-center rounded-full bg-red-600 text-white transition hover:bg-red-700"
-        >
-          <span className="block h-4 w-4 rounded-sm bg-white" aria-label="Stop recording" />
-        </button>
-      ) : (
-        <button
-          type="button"
-          onClick={start}
-          disabled={disabled}
-          className="flex h-14 w-14 items-center justify-center rounded-full bg-zinc-900 text-white transition hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          <span className="block h-5 w-3 rounded-sm bg-white" aria-label="Start recording" />
-        </button>
-      )}
+    <div className="flex flex-wrap items-center gap-3">
+      <button
+        type="button"
+        onClick={recording ? stop : start}
+        disabled={disabled || (done && !recording)}
+        aria-label={recording ? "Stop recording" : "Start recording"}
+        className={`flex h-14 w-14 items-center justify-center rounded-full text-white transition disabled:cursor-not-allowed disabled:opacity-40 ${
+          recording ? "bg-red-600 hover:bg-red-700" : "bg-zinc-900 hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+        }`}
+      >
+        {recording ? <span className="block h-4 w-4 rounded-sm bg-white" /> : <span className="block h-5 w-3 rounded-sm bg-white" />}
+      </button>
       <div className="font-mono text-sm text-zinc-600 dark:text-zinc-400">
-        {recording ? `Recording… ${mm}:${ss}` : "Tap to start dictating your standup recap"}
+        {done && !recording ? "Recording ready ✓" : recording ? `Recording… ${formatTs(seconds)}` : "Tap to record your standup recap"}
       </div>
+      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
     </div>
   );
 }
