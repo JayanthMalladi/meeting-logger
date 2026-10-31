@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { btnGhost, btnPrimary, card, field } from "./ui";
+import { btnGhost, btnPrimary, card, eyebrow, field } from "./ui";
 
 type Props = {
   shareUrl: string | null; // null while encoding
@@ -61,7 +61,7 @@ export default function ShareCard({ shareUrl, truncated, onCopyMarkdown, onSlack
   return (
     <section className={`${card} flex flex-col gap-3`} aria-label="Share">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.06em] text-zinc-500 dark:text-zinc-400">
+        <h2 className={`${eyebrow} font-serif !text-2xl !font-normal !normal-case !tracking-tight text-zinc-900 dark:!text-zinc-50`}>
           Share
         </h2>
         <span className="text-xs text-zinc-400 dark:text-zinc-500">
@@ -72,7 +72,7 @@ export default function ShareCard({ shareUrl, truncated, onCopyMarkdown, onSlack
       {shareUrl ? (
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <span
-            className="block min-w-0 flex-1 truncate rounded-lg border border-zinc-200 bg-zinc-50 px-2.5 py-1.5 font-mono text-xs text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400"
+            className="block min-w-0 flex-1 truncate rounded-full border border-black/[0.06] bg-black/[0.03] px-4 py-2 font-mono text-xs text-zinc-600 dark:border-white/10 dark:bg-white/[0.04] dark:text-zinc-400"
             title={shareUrl}
           >
             {shareUrl.replace(/^https?:\/\//, "")}
@@ -100,7 +100,7 @@ export default function ShareCard({ shareUrl, truncated, onCopyMarkdown, onSlack
       )}
 
       <details className="group">
-        <summary className="cursor-pointer rounded text-xs text-zinc-500 hover:text-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60 dark:hover:text-zinc-300">
+        <summary className="cursor-pointer rounded text-xs text-zinc-500 hover:text-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF]/60 dark:hover:text-zinc-300">
           Post to Slack
         </summary>
         <div className="mt-2 flex flex-col gap-2">
@@ -122,7 +122,7 @@ export default function ShareCard({ shareUrl, truncated, onCopyMarkdown, onSlack
             <p
               className={
                 slackMsg.ok
-                  ? "text-sm text-emerald-600 dark:text-emerald-400"
+                  ? "text-sm text-[#6E56CF] dark:text-[#a898f0]"
                   : "text-sm text-red-600 dark:text-red-400"
               }
             >

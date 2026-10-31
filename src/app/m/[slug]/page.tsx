@@ -9,13 +9,13 @@ import Board from "@/components/Board";
 import TranscriptPanel from "@/components/TranscriptPanel";
 import { btnGhost, btnPrimary, card } from "@/components/ui";
 
-const SHELL = "mx-auto flex w-full max-w-[768px] flex-col gap-4 px-4 py-8 sm:py-10";
+const SHELL = "mx-auto flex w-full max-w-[768px] flex-col gap-4 px-4 py-6 sm:py-8";
 
 function Skeleton() {
   return (
     <div className={SHELL} aria-busy="true" aria-label="Loading board">
       <div className="skel !h-3.5 w-40" />
-      <div className="skel !h-6 w-64" />
+      <div className="skel !h-9 w-72" />
       <div className={`${card} flex flex-col gap-3`}>
         <div className="skel w-1/3" />
         <div className="skel w-4/5" />
@@ -69,7 +69,7 @@ function ShareViewInner() {
     return (
       <div className={SHELL}>
         <div className={`${card} flex flex-col items-start gap-3`}>
-          <h1 className="text-base font-semibold">This link doesn&apos;t open</h1>
+          <h1 className="font-serif text-3xl">This link doesn&apos;t open</h1>
           <p className="text-[13px] text-zinc-600 dark:text-zinc-400">
             It is malformed, cut off, or was made by an older version of NoHands Log.
           </p>
@@ -88,13 +88,13 @@ function ShareViewInner() {
 
   return (
     <div
-      className={`mx-auto flex w-full flex-col gap-4 px-4 py-8 sm:py-10 ${
+      className={`mx-auto flex w-full flex-col gap-5 px-4 py-6 sm:py-8 ${
         hasTranscript ? "max-w-[768px] lg:max-w-[1180px]" : "max-w-[768px]"
       }`}
     >
       <header className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-[11px] text-zinc-500 dark:text-zinc-400">
-          <Link href="/" className="text-[13px] font-bold tracking-[-0.01em] text-zinc-900 hover:underline dark:text-zinc-50">
+          <Link href="/" className="text-[15px] font-semibold tracking-[-0.01em] text-zinc-900 hover:underline dark:text-zinc-50">
             NoHands Log
           </Link>
           <span aria-hidden>·</span>
@@ -107,7 +107,7 @@ function ShareViewInner() {
           <button type="button" onClick={() => copy("md")} className={btnGhost}>
             {copied === "md" ? "Markdown copied ✓" : "Copy as Markdown"}
           </button>
-          <Link href="/" className={`${btnGhost} !bg-zinc-900 !text-white hover:!bg-zinc-700 dark:!bg-zinc-100 dark:!text-zinc-900`}>
+          <Link href="/" className={`${btnGhost} !border-transparent !bg-[#14131A] !text-white hover:!bg-[#2b2938] dark:!bg-[#F6F3EE] dark:!text-[#14131A]`}>
             Make your own board
           </Link>
         </div>

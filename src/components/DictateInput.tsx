@@ -2,12 +2,13 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { SampleRecap } from "@/lib/samples";
-import { field, kbd } from "./ui";
 
 type Props = {
   value: string;
   onChange: (text: string) => void;
   onBuild: () => void;
+  /** Fires when text starts/stops arriving (drives the waveform). */
+  onListening?: (listening: boolean) => void;
   samples: SampleRecap[];
   onSample: (sample: SampleRecap) => void;
   disabled?: boolean;
@@ -31,6 +32,7 @@ export default function DictateInput({
   value,
   onChange,
   onBuild,
+  onListening,
   samples,
   onSample,
   disabled,
@@ -55,7 +57,7 @@ export default function DictateInput({
     const el = textareaRef.current;
     if (!el) return;
     el.style.height = "auto";
-    el.style.height = `${Math.min(Math.max(el.scrollHeight, 144), 384)}px`;
+    el.style.height = `${Math.min(Math.max(el.scrollHeight, 160), 384)}px`;
   }, [value]);
 
   useEffect(
@@ -67,8 +69,12 @@ export default function DictateInput({
 
   const pulseListening = () => {
     setListening(true);
+    onListening?.(true);
     if (listenTimer.current !== null) window.clearTimeout(listenTimer.current);
-    listenTimer.current = window.setTimeout(() => setListening(false), 1400);
+    listenTimer.current = window.setTimeout(() => {
+      setListening(false);
+      onListening?.(false);
+    }, 1400);
   };
 
   return (
@@ -87,28 +93,21 @@ export default function DictateInput({
               pulseListening();
             }}
             onKeyDown={handleKeyDown}
-            placeholder="Click here, hold your Wispr Flow hotkey, and speak your recap. Who decided what, who's doing what by when, and what's still open."
-            className={`${field} resize-none leading-relaxed`}
-            style={{ minHeight: 144 }}
+            placeholder="Speak your recap. Who decided what, who's doing what by when, and what's still open…"
+            className="w-full resize-none rounded-2xl bg-transparent px-1 py-1 text-[17px] leading-relaxed text-zinc-900 placeholder:font-serif placeholder:text-[19px] placeholder:italic placeholder:text-zinc-400 focus:outline-none disabled:opacity-50 dark:text-zinc-50 dark:placeholder:text-zinc-500"
+            style={{ minHeight: 160 }}
           />
           {listening && (
             <span
               role="status"
-              className="pointer-events-none absolute right-2 top-2 inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300"
+              className="pointer-events-none absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-[#ece6ff] px-2.5 py-0.5 text-[11px] font-medium text-[#4b3a9a] dark:bg-[#2a2542] dark:text-[#cfc4ff]"
             >
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#6E56CF]" />
               Listening via Wispr Flow
             </span>
           )}
         </div>
-        <div className="mt-1.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs text-zinc-500 dark:text-zinc-400">
-          <span className="flex items-center gap-1.5">
-            <span aria-hidden>🎙</span> Hold your Wispr Flow hotkey and speak.
-            <span className="hidden items-center gap-1 sm:inline-flex">
-              <kbd className={kbd}>Ctrl/⌘</kbd>
-              <kbd className={kbd}>↵</kbd> to build
-            </span>
-          </span>
+        <div className="mt-1 text-right text-xs text-zinc-500 dark:text-zinc-400">
           <span className={tooShort ? "text-amber-700 dark:text-amber-400" : ""}>
             {words} words
             {tooShort && ` · need ${MIN_WORDS}+, or try a sample`}
@@ -124,7 +123,7 @@ export default function DictateInput({
               type="button"
               onClick={() => onSample(sample)}
               disabled={disabled}
-              className="rounded-full border border-dashed border-zinc-300 px-2.5 py-1 text-[11px] text-zinc-600 transition hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-600 dark:text-zinc-400 dark:hover:bg-emerald-950 dark:hover:text-emerald-300"
+              className="rounded-full bg-[#ece6ff] px-3 py-1 text-xs font-medium text-[#4b3a9a] transition hover:bg-[#ddd3ff] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF]/60 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#2a2542] dark:text-[#cfc4ff] dark:hover:bg-[#352e55]"
             >
               Sample: {sample.label.toLowerCase()}
             </button>

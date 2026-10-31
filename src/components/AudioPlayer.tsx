@@ -46,7 +46,7 @@ export default function AudioPlayer({ audio, seekTo, seekTick }: Props) {
   if (!audio) return null;
 
   return (
-    <div className={`${card} !p-2.5`}>
+    <div className={`${card} !rounded-full !p-2`}>
       <audio ref={ref} controls aria-label="Meeting audio" className="h-10 w-full" />
     </div>
   );

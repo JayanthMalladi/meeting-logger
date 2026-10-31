@@ -10,7 +10,7 @@ import type {
   Question,
   Segment,
 } from "@/lib/types";
-import { card, sectionHeading } from "./ui";
+import { sectionHeading } from "./ui";
 
 type Props = {
   extracted: Extracted;
@@ -58,7 +58,7 @@ function SourceChip({
       }}
       aria-label={ts ? `Jump to ${ts}` : `Show source sentence ${seg + 1}`}
       title={ts ? "Play from here" : "Show source sentence"}
-      className="shrink-0 rounded px-1 py-0.5 font-mono text-[10px] text-zinc-500 transition hover:bg-emerald-100 hover:text-emerald-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60 dark:text-zinc-400 dark:hover:bg-emerald-900/50 dark:hover:text-emerald-200"
+      className="shrink-0 rounded-full bg-black/[0.05] px-2 py-0.5 font-mono text-[10px] text-zinc-500 transition hover:bg-[#ece6ff] hover:text-[#4b3a9a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF]/60 dark:bg-white/10 dark:text-zinc-400 dark:hover:bg-[#2a2542] dark:hover:text-[#cfc4ff]"
     >
       {label}
     </button>
@@ -72,15 +72,43 @@ type CellEdit = {
   draft: string;
 };
 
-const rowBase =
-  "group flex items-start gap-2 rounded-lg px-2 py-1.5 text-[13px] transition-colors hover:bg-emerald-50 dark:hover:bg-emerald-950/30";
-const rowSel = "bg-emerald-50 dark:bg-emerald-950/40";
+const rowSel = "!border-[#6E56CF]/50 !bg-[#f1ecff] dark:!bg-[#2a2542]";
 const pillBase =
-  "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium";
-const pillOwner = `${pillBase} bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200`;
-const pillUnassigned = `${pillBase} bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300`;
+  "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-medium";
+const pillDue = `${pillBase} bg-black/[0.05] text-zinc-700 dark:bg-white/10 dark:text-zinc-200`;
+const pillUnassigned = `${pillBase} border border-dashed border-amber-400 bg-amber-50 text-amber-800 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-300`;
 const delBtn =
-  "shrink-0 rounded px-1 text-sm leading-none text-zinc-400 hover:bg-zinc-200 hover:text-zinc-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60 dark:hover:bg-zinc-700 dark:hover:text-zinc-200";
+  "shrink-0 rounded-full px-1.5 text-sm leading-none text-zinc-400 hover:bg-black/10 hover:text-zinc-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF]/60 dark:hover:bg-white/15 dark:hover:text-zinc-200";
+const itemCard =
+  "group flex items-start gap-3 rounded-2xl border border-black/[0.06] bg-white px-4 py-3 text-[14px] shadow-[0_4px_20px_-10px_rgba(40,30,80,0.15)] transition-colors hover:border-[#6E56CF]/30 dark:border-white/10 dark:bg-[#17161C]";
+
+const AVATAR = [
+  "bg-[#ece6ff] text-[#4b3a9a] dark:bg-[#2a2542] dark:text-[#cfc4ff]",
+  "bg-[#ffe6d6] text-[#8a4a24] dark:bg-[#3a2a22] dark:text-[#ffc9a8]",
+  "bg-[#dff0ff] text-[#1f5a85] dark:bg-[#1d2f3d] dark:text-[#a9d6f5]",
+  "bg-[#dcf5e4] text-[#25663d] dark:bg-[#1d3326] dark:text-[#a6e3bb]",
+  "bg-[#ffe0ec] text-[#8a2b55] dark:bg-[#3a2230] dark:text-[#f5b0cc]",
+];
+
+function Avatar({ name }: { name: string }) {
+  let h = 0;
+  for (const ch of name.toLowerCase()) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  const initials =
+    name
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((p) => p[0]?.toUpperCase() ?? "")
+      .join("") || "?";
+  return (
+    <span
+      aria-hidden
+      className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-[10px] font-semibold ${AVATAR[h % AVATAR.length]}`}
+    >
+      {initials}
+    </span>
+  );
+}
 
 /**
  * B9: editable decision board (Ledger style).
@@ -155,7 +183,7 @@ export default function Board({
         if (e.key === "Escape") cancelEdit();
       }}
       onBlur={commitEdit}
-      className="w-full min-w-0 rounded-md border border-emerald-500 bg-white px-1.5 py-0.5 text-[13px] text-zinc-900 outline-none ring-2 ring-emerald-500/25 dark:bg-zinc-950 dark:text-zinc-100"
+      className="w-full min-w-0 rounded-full border border-[#6E56CF] bg-white px-3 py-1 text-[13px] text-zinc-900 outline-none ring-2 ring-[#6E56CF]/25 dark:bg-[#0E0D12] dark:text-zinc-100"
     />
     );
   };
@@ -186,201 +214,189 @@ export default function Board({
   const dateLabel = formatDate(meta.date);
   const headline = [meta.title ?? "Decision board", dateLabel].filter(Boolean).join(" · ");
 
-  const heading = (color: string, text: string, count: number, tone?: string): ReactNode => (
-    <h2 className={`${sectionHeading} ${tone ?? ""}`}>
-      <i className={`inline-block h-2 w-2 rounded-sm ${color}`} aria-hidden />
-      {text} · {count}
+  const heading = (dot: string, text: string, count: number): ReactNode => (
+    <h2 className={sectionHeading}>
+      <i className={`inline-block h-2.5 w-2.5 rounded-full ${dot}`} aria-hidden />
+      {text}
+      <span className="font-sans text-xs text-zinc-400 dark:text-zinc-500">{count}</span>
     </h2>
   );
 
+  const textCell = (
+    section: CellEdit["section"],
+    i: number,
+    value: string,
+    seg: number | undefined,
+    label: string,
+  ) =>
+    isEditing(section, i, "text") ? (
+      <div className="min-w-0 flex-1">
+        {editInput({ section, index: i, field: "text", draft: value }, label)}
+      </div>
+    ) : (
+      <span
+        className={`min-w-0 flex-1 leading-snug text-zinc-800 dark:text-zinc-100 ${editableCls}`}
+        onClick={() => startEdit(section, i, "text", value, seg)}
+      >
+        {value}
+      </span>
+    );
+
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
-        <h2 className="text-base font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+    <div className="flex flex-col gap-7">
+      <div>
+        <h2 className="font-serif text-[34px] leading-[1.05] tracking-[-0.015em] text-zinc-900 sm:text-[44px] dark:text-zinc-50">
           {headline}
         </h2>
         {metaBits.length > 0 && (
-          <span className="text-xs text-zinc-500 dark:text-zinc-400">{metaBits.join(" · ")}</span>
+          <span className="mt-2 block text-xs text-zinc-500 dark:text-zinc-400">{metaBits.join(" · ")}</span>
+        )}
+        {extracted.summary && (
+          <p className="fade-in mt-3 max-w-2xl text-[15px] leading-7 text-zinc-600 dark:text-zinc-300">
+            {extracted.summary}
+          </p>
         )}
       </div>
 
-      {extracted.summary && (
-        <p className="fade-in text-[13px] leading-6 text-zinc-600 dark:text-zinc-300">
-          {extracted.summary}
-        </p>
-      )}
+      <section className="fade-in" style={{ animationDelay: "0ms" }}>
+        {heading("bg-[#8fd6a8]", "Decisions", extracted.decisions.length)}
+        {extracted.decisions.length ? (
+          <ul className="flex flex-col gap-2.5">
+            {extracted.decisions.map((d, i) => (
+              <li key={i} className={`${itemCard} ${isSel(d.seg) ? rowSel : ""}`}>
+                <span className="mt-px shrink-0 rounded-full bg-[#dcf5e4] px-2.5 py-0.5 text-[11px] font-semibold text-[#25663d] dark:bg-[#1d3326] dark:text-[#a6e3bb]">
+                  Decided
+                </span>
+                {textCell("decisions", i, d.text, d.seg, "Edit decision")}
+                <SourceChip ts={d.ts} seg={d.seg} onSelect={onSelect} />
+                {editable && (
+                  <button type="button" aria-label="Delete decision" onClick={() => deleteItem("decisions", i)} className={delBtn}>
+                    ×
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="px-1 text-[13px] text-zinc-400 dark:text-zinc-500">No decisions captured.</p>
+        )}
+      </section>
 
-      <div className={`${card} flex flex-col gap-4`}>
-        <section className="fade-in" style={{ animationDelay: "0ms" }}>
-          {heading("bg-emerald-500", "Decisions", extracted.decisions.length)}
-          {extracted.decisions.length ? (
-            <ul className="flex flex-col">
-              {extracted.decisions.map((d, i) => (
-                <li key={i} className={`${rowBase} ${isSel(d.seg) ? rowSel : ""}`}>
-                  <span aria-hidden className="mt-px shrink-0 text-emerald-600 dark:text-emerald-500">
-                    ✓
-                  </span>
-                  {isEditing("decisions", i, "text") ? (
-                    <div className="min-w-0 flex-1">
-                      {editInput({ section: "decisions", index: i, field: "text", draft: d.text }, "Edit decision")}
-                    </div>
-                  ) : (
-                    <span
-                      className={`min-w-0 flex-1 text-zinc-800 dark:text-zinc-100 ${editableCls}`}
-                      onClick={() => startEdit("decisions", i, "text", d.text, d.seg)}
-                    >
-                      {d.text}
-                    </span>
-                  )}
-                  <SourceChip ts={d.ts} seg={d.seg} onSelect={onSelect} />
-                  {editable && (
-                    <button type="button" aria-label="Delete decision" onClick={() => deleteItem("decisions", i)} className={delBtn}>
-                      ×
-                    </button>
-                  )}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="px-2 text-[13px] text-zinc-400 dark:text-zinc-500">No decisions captured.</p>
-          )}
-        </section>
-
-        <section className="fade-in" style={{ animationDelay: "120ms" }}>
-          {heading("bg-zinc-900 dark:bg-zinc-200", "Actions", extracted.actions.length)}
-          {extracted.actions.length ? (
-            <table className="w-full text-[13px]">
-              <thead className="sr-only sm:not-sr-only">
-                <tr className="text-left text-[10px] font-medium uppercase tracking-[0.06em] text-zinc-400 dark:text-zinc-500">
-                  <th className="px-2 pb-1 font-medium">Task</th>
-                  <th className="px-2 pb-1 font-medium">Owner</th>
-                  <th className="px-2 pb-1 font-medium">Due</th>
-                  <th className="pb-1" aria-label="Source" />
-                </tr>
-              </thead>
-              <tbody>
-                {extracted.actions.map((a, i) => (
-                  <tr
-                    key={i}
-                    className={`group flex flex-wrap items-center gap-x-2 gap-y-1 rounded-lg px-0 py-1.5 transition-colors hover:bg-emerald-50 sm:table-row dark:hover:bg-emerald-950/30 ${
-                      isSel(a.seg) ? rowSel : ""
-                    }`}
+      <section className="fade-in" style={{ animationDelay: "120ms" }}>
+        {heading("bg-[#6E56CF]", "Actions", extracted.actions.length)}
+        {extracted.actions.length ? (
+          <ul className="flex flex-col gap-2.5">
+            {extracted.actions.map((a, i) => (
+              <li
+                key={i}
+                className={`${itemCard} flex-wrap items-center sm:flex-nowrap ${isSel(a.seg) ? rowSel : ""}`}
+              >
+                {isEditing("actions", i, "text") ? (
+                  <div className="min-w-0 basis-full sm:flex-1 sm:basis-0">
+                    {editInput({ section: "actions", index: i, field: "text", draft: a.text }, "Edit task")}
+                  </div>
+                ) : (
+                  <span
+                    className={`min-w-0 basis-full leading-snug text-zinc-800 sm:flex-1 sm:basis-0 dark:text-zinc-100 ${editableCls}`}
+                    onClick={() => startEdit("actions", i, "text", a.text, a.seg)}
                   >
-                    {isEditing("actions", i, "text") ? (
-                      <td className="basis-full px-2 sm:table-cell sm:basis-auto">
-                        {editInput({ section: "actions", index: i, field: "text", draft: a.text }, "Edit task")}
-                      </td>
-                    ) : (
-                      <td
-                        className={`basis-full px-2 text-zinc-800 sm:table-cell sm:basis-auto sm:rounded-l-lg sm:py-1.5 dark:text-zinc-100 ${editableCls}`}
-                        onClick={() => startEdit("actions", i, "text", a.text, a.seg)}
-                      >
-                        {a.text}
-                      </td>
-                    )}
-                    {isEditing("actions", i, "owner") ? (
-                      <td className="px-2 sm:table-cell">
-                        {editInput({ section: "actions", index: i, field: "owner", draft: a.owner ?? "" }, "Edit owner")}
-                      </td>
-                    ) : (
-                      <td
-                        className={`px-2 sm:table-cell sm:whitespace-nowrap ${editableCls}`}
-                        onClick={() => startEdit("actions", i, "owner", a.owner ?? "", a.seg)}
-                      >
-                        {a.owner ? (
-                          <span className={pillOwner}>
-                            {a.owner}
-                            {editable && <span aria-hidden className="hidden text-zinc-400 group-hover:inline">✎</span>}
-                          </span>
-                        ) : (
-                          <span className={pillUnassigned}>Unassigned</span>
-                        )}
-                      </td>
-                    )}
-                    {isEditing("actions", i, "due") ? (
-                      <td className="px-2 sm:table-cell">
-                        {editInput({ section: "actions", index: i, field: "due", draft: a.due ?? "" }, "Edit due date")}
-                      </td>
-                    ) : (
-                      <td
-                        className={`px-2 sm:table-cell sm:whitespace-nowrap ${editableCls}`}
-                        onClick={() => startEdit("actions", i, "due", a.due ?? "", a.seg)}
-                      >
-                        <span className={pillOwner}>{a.due ?? "–"}</span>
-                      </td>
-                    )}
-                    <td className="ml-auto px-2 text-right sm:table-cell sm:whitespace-nowrap sm:rounded-r-lg">
-                      <SourceChip ts={a.ts} seg={a.seg} onSelect={onSelect} />
-                      {editable && (
-                        <button type="button" aria-label="Delete action" onClick={() => deleteItem("actions", i)} className={`${delBtn} ml-1`}>
-                          ×
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <p className="px-2 text-[13px] text-zinc-400 dark:text-zinc-500">No actions captured.</p>
-          )}
-        </section>
-
-        <section className="fade-in" style={{ animationDelay: "240ms" }}>
-          {heading("bg-sky-500", "Open questions", extracted.openQuestions.length)}
-          {extracted.openQuestions.length ? (
-            <ul className="flex flex-col">
-              {extracted.openQuestions.map((q, i) => (
-                <li key={i} className={`${rowBase} ${isSel(q.seg) ? rowSel : ""}`}>
-                  <span aria-hidden className="mt-px shrink-0 font-semibold text-sky-600 dark:text-sky-400">
-                    ?
+                    {a.text}
                   </span>
-                  {isEditing("questions", i, "text") ? (
-                    <div className="min-w-0 flex-1">
-                      {editInput({ section: "questions", index: i, field: "text", draft: q.text }, "Edit question")}
-                    </div>
-                  ) : (
-                    <span
-                      className={`min-w-0 flex-1 text-zinc-800 dark:text-zinc-100 ${editableCls}`}
-                      onClick={() => startEdit("questions", i, "text", q.text, q.seg)}
-                    >
-                      {q.text}
-                    </span>
-                  )}
-                  <SourceChip ts={q.ts} seg={q.seg} onSelect={onSelect} />
+                )}
+                {isEditing("actions", i, "owner") ? (
+                  <div className="w-40 shrink-0">
+                    {editInput({ section: "actions", index: i, field: "owner", draft: a.owner ?? "" }, "Edit owner")}
+                  </div>
+                ) : (
+                  <span
+                    className={`shrink-0 whitespace-nowrap ${editableCls}`}
+                    onClick={() => startEdit("actions", i, "owner", a.owner ?? "", a.seg)}
+                  >
+                    {a.owner ? (
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-black/[0.04] py-0.5 pl-0.5 pr-2.5 text-[12px] font-medium text-zinc-700 dark:bg-white/[0.07] dark:text-zinc-200">
+                        <Avatar name={a.owner} />
+                        {a.owner}
+                      </span>
+                    ) : (
+                      <span className={pillUnassigned}>Unassigned</span>
+                    )}
+                  </span>
+                )}
+                {isEditing("actions", i, "due") ? (
+                  <div className="w-32 shrink-0">
+                    {editInput({ section: "actions", index: i, field: "due", draft: a.due ?? "" }, "Edit due date")}
+                  </div>
+                ) : (
+                  <span
+                    className={`shrink-0 whitespace-nowrap ${editableCls}`}
+                    onClick={() => startEdit("actions", i, "due", a.due ?? "", a.seg)}
+                  >
+                    <span className={pillDue}>{a.due ? `Due ${a.due}` : "No date"}</span>
+                  </span>
+                )}
+                <span className="ml-auto flex shrink-0 items-center gap-1">
+                  <SourceChip ts={a.ts} seg={a.seg} onSelect={onSelect} />
                   {editable && (
-                    <button type="button" aria-label="Delete question" onClick={() => deleteItem("questions", i)} className={delBtn}>
+                    <button type="button" aria-label="Delete action" onClick={() => deleteItem("actions", i)} className={delBtn}>
                       ×
                     </button>
                   )}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="px-2 text-[13px] text-zinc-400 dark:text-zinc-500">No open questions.</p>
-          )}
-        </section>
-
-        {extracted.atRisk.length > 0 && (
-          <section
-            className="fade-in rounded-lg border border-amber-300 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/40"
-            style={{ animationDelay: "360ms" }}
-          >
-            <h2 className="mb-1 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] text-amber-800 dark:text-amber-400">
-              <i className="inline-block h-2 w-2 rounded-sm bg-amber-500" aria-hidden />
-              At risk · {extracted.atRisk.length}
-            </h2>
-            <ul className="flex flex-col gap-1 text-[13px] text-amber-900 dark:text-amber-200">
-              {extracted.atRisk.map((r, i) => (
-                <li key={i} className="flex gap-2">
-                  <span aria-hidden>⚑</span>
-                  {r}
-                </li>
-              ))}
-            </ul>
-          </section>
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="px-1 text-[13px] text-zinc-400 dark:text-zinc-500">No actions captured.</p>
         )}
-      </div>
+      </section>
+
+      <section className="fade-in" style={{ animationDelay: "240ms" }}>
+        {heading("bg-[#C9B8FF]", "Open questions", extracted.openQuestions.length)}
+        {extracted.openQuestions.length ? (
+          <ul className="flex flex-col gap-2.5">
+            {extracted.openQuestions.map((q, i) => (
+              <li
+                key={i}
+                className={`${itemCard} !border-[#C9B8FF]/50 !bg-[#f6f2ff] dark:!border-[#6E56CF]/30 dark:!bg-[#1d1a2b] ${isSel(q.seg) ? rowSel : ""}`}
+              >
+                <span aria-hidden className="mt-px grid h-5 w-5 shrink-0 place-items-center rounded-full bg-[#ece6ff] text-xs font-semibold text-[#4b3a9a] dark:bg-[#2a2542] dark:text-[#cfc4ff]">
+                  ?
+                </span>
+                {textCell("questions", i, q.text, q.seg, "Edit question")}
+                <SourceChip ts={q.ts} seg={q.seg} onSelect={onSelect} />
+                {editable && (
+                  <button type="button" aria-label="Delete question" onClick={() => deleteItem("questions", i)} className={delBtn}>
+                    ×
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="px-1 text-[13px] text-zinc-400 dark:text-zinc-500">No open questions.</p>
+        )}
+      </section>
+
+      {extracted.atRisk.length > 0 && (
+        <section
+          className="fade-in rounded-3xl border border-[#ffd3b8] bg-[#fff1e6] p-5 dark:border-[#5a3a28] dark:bg-[#2a1d16]"
+          style={{ animationDelay: "360ms" }}
+        >
+          <h2 className="mb-2 flex items-center gap-2 font-serif text-2xl text-[#8a4a24] dark:text-[#ffc9a8]">
+            <i className="inline-block h-2.5 w-2.5 rounded-full bg-[#ff9d6c]" aria-hidden />
+            At risk
+            <span className="font-sans text-xs opacity-70">{extracted.atRisk.length}</span>
+          </h2>
+          <ul className="flex flex-col gap-1.5 text-[14px] text-[#6b3a1c] dark:text-[#ffd9c2]">
+            {extracted.atRisk.map((r, i) => (
+              <li key={i} className="flex gap-2">
+                <span aria-hidden>⚑</span>
+                {r}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </div>
   );
 }
