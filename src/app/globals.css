@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
-/* Ledger palette: zinc neutrals, emerald = decisions / primary accent,
-   sky = questions, amber = at risk / unassigned. Dark via prefers-color-scheme. */
+/* Flow: warm cream + violet accent, serif display, aura gradient. */
 :root {
-  --background: #fafafa;
-  --foreground: #18181b;
+  --background: #f6f3ee;
+  --foreground: #18171d;
+  --aura-opacity: 0.55;
 }
 
 @theme inline {
@@ -12,12 +12,14 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-serif: var(--font-instrument-serif), Georgia, serif;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #09090b;
-    --foreground: #f4f4f5;
+    --background: #0e0d12;
+    --foreground: #f4f2f8;
+    --aura-opacity: 0.22;
   }
 }
 
@@ -26,79 +28,117 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   font-size: 14px;
-  line-height: 1.45;
+  line-height: 1.5;
 }
+
+/* Aura: soft blurred drifting gradient behind everything. */
+.aura {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  opacity: var(--aura-opacity);
+}
+.aura i {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+  will-change: transform;
+}
+.aura i:nth-child(1) {
+  width: 560px; height: 560px; left: 8%; top: -120px;
+  background: #c9b8ff;
+  animation: aura-a 26s ease-in-out infinite alternate;
+}
+.aura i:nth-child(2) {
+  width: 480px; height: 480px; right: 6%; top: 40px;
+  background: #ffd3b8;
+  animation: aura-b 32s ease-in-out infinite alternate;
+}
+.aura i:nth-child(3) {
+  width: 520px; height: 520px; left: 35%; top: 180px;
+  background: #bfe3ff;
+  animation: aura-c 38s ease-in-out infinite alternate;
+}
+@keyframes aura-a { to { transform: translate(120px, 80px) scale(1.15); } }
+@keyframes aura-b { to { transform: translate(-140px, 100px) scale(1.1); } }
+@keyframes aura-c { to { transform: translate(-80px, -40px) scale(1.2); } }
 
 @keyframes ledger-in {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
 }
 @keyframes ledger-shimmer {
-  0% {
-    background-position: -200px 0;
-  }
-  100% {
-    background-position: 200px 0;
-  }
+  0% { background-position: -200px 0; }
+  100% { background-position: 200px 0; }
 }
 @keyframes ledger-flash {
-  0% {
-    box-shadow: 0 0 0 0 rgb(16 185 129 / 0.55);
-  }
-  100% {
-    box-shadow: 0 0 0 10px rgb(16 185 129 / 0);
-  }
+  0% { box-shadow: 0 0 0 0 rgb(110 86 207 / 0.5); }
+  100% { box-shadow: 0 0 0 10px rgb(110 86 207 / 0); }
 }
-@keyframes ledger-blink {
-  50% {
-    opacity: 0;
-  }
+@keyframes ledger-blink { 50% { opacity: 0; } }
+@keyframes wave {
+  0%, 100% { transform: scaleY(0.25); }
+  50% { transform: scaleY(1); }
+}
+@keyframes orb {
+  0%, 100% { transform: scale(1); filter: blur(0); }
+  50% { transform: scale(1.12); filter: blur(1px); }
+}
+@keyframes orb-ring {
+  0% { transform: scale(0.8); opacity: 0.6; }
+  100% { transform: scale(1.9); opacity: 0; }
 }
 
-.fade-in {
-  animation: ledger-in 0.5s both;
-}
+.fade-in { animation: ledger-in 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 .skel {
   height: 12px;
-  border-radius: 6px;
-  background: linear-gradient(90deg, #ececef 0, #dcdce1 50%, #ececef 100%);
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #efebe4 0, #e2ddd3 50%, #efebe4 100%);
   background-size: 400px 100%;
   animation: ledger-shimmer 1.3s infinite linear;
 }
-.flash {
-  animation: ledger-flash 1.5s ease-out;
-}
+.flash { animation: ledger-flash 1.5s ease-out; }
 .caret {
-  display: inline-block;
-  width: 2px;
-  height: 1em;
-  background: currentColor;
-  vertical-align: -2px;
-  animation: ledger-blink 1s steps(1) infinite;
+  display: inline-block; width: 2px; height: 1em; background: currentColor;
+  vertical-align: -2px; animation: ledger-blink 1s steps(1) infinite;
 }
+
+.wave { display: inline-flex; align-items: center; gap: 3px; height: 24px; }
+.wave span {
+  display: block; width: 3px; height: 100%; border-radius: 9999px;
+  background: #6e56cf; transform: scaleY(0.25); opacity: 0.45;
+  transform-origin: center;
+}
+.wave[data-active="true"] span { opacity: 1; animation: wave 0.9s ease-in-out infinite; }
+
+.orb {
+  position: relative; width: 84px; height: 84px; border-radius: 9999px;
+  background: radial-gradient(circle at 30% 30%, #fff 0, #c9b8ff 30%, #ffd3b8 65%, #bfe3ff 100%);
+  box-shadow: 0 10px 50px rgba(110, 86, 207, 0.35);
+  animation: orb 2.6s ease-in-out infinite;
+}
+.orb::after {
+  content: ""; position: absolute; inset: 0; border-radius: 9999px;
+  border: 2px solid #c9b8ff; animation: orb-ring 2.4s ease-out infinite;
+}
+
 @media (prefers-color-scheme: dark) {
   .skel {
-    background: linear-gradient(90deg, #27272a 0, #3f3f46 50%, #27272a 100%);
+    background: linear-gradient(90deg, #1f1e26 0, #2d2b36 50%, #1f1e26 100%);
     background-size: 400px 100%;
   }
+  .wave span { background: #a898f0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .fade-in,
-  .skel,
-  .flash,
-  .caret {
+  .fade-in, .skel, .flash, .caret, .aura i, .orb, .orb::after,
+  .wave[data-active="true"] span {
     animation: none;
   }
+  .wave[data-active="true"] span { transform: scaleY(0.6); }
 }
 @media print {
-  body {
-    background: #fff;
-    color: #000;
-  }
+  body { background: #fff; color: #000; }
+  .aura { display: none; }
 }

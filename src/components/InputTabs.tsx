@@ -51,7 +51,7 @@ export default function InputTabs({ active, onChange }: Props) {
   };
 
   return (
-    <div role="tablist" aria-label="Input source" className="mb-3 flex w-max max-w-full gap-1 rounded-lg bg-zinc-100 p-[3px] dark:bg-zinc-800" onKeyDown={onKeyDown}>
+    <div role="tablist" aria-label="Input source" className="mb-4 flex w-max max-w-full gap-1 rounded-full bg-black/[0.05] p-1 dark:bg-white/[0.07]" onKeyDown={onKeyDown}>
       {TABS.map((tab, i) => {
         const isActive = tab.id === active;
         return (
@@ -66,8 +66,8 @@ export default function InputTabs({ active, onChange }: Props) {
             aria-selected={isActive}
             tabIndex={isActive ? 0 : -1}
             onClick={() => onChange(tab.id)}
-            className={`rounded-md px-3.5 py-1.5 text-xs transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60 ${
-              isActive ? "bg-white font-semibold text-zinc-900 shadow-sm dark:bg-zinc-950 dark:text-zinc-50" : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
+            className={`rounded-full px-4 py-1.5 text-[13px] transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#6E56CF]/60 ${
+              isActive ? "bg-white font-semibold text-zinc-900 shadow-sm dark:bg-[#2a2833] dark:text-zinc-50" : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
             }`}
           >
             {tab.label}

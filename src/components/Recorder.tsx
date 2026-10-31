@@ -5,6 +5,7 @@ import { RECORDER_BITS_PER_SECOND, formatTs } from "@/lib/audio";
 
 type Props = {
   onAudio: (blob: Blob, mime: string, source: "recorded") => void;
+  onRecording?: (recording: boolean) => void;
   disabled?: boolean;
 };
 
@@ -25,7 +26,7 @@ function pickMimeType(): string | undefined {
  * MediaRecorder wrapper: record/stop + live mm:ss timer, 15-minute auto-stop,
  * emits a Blob on stop. No third-party recorder lib.
  */
-export default function Recorder({ onAudio, disabled }: Props) {
+export default function Recorder({ onAudio, onRecording, disabled }: Props) {
   const [recording, setRecording] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [done, setDone] = useState(false);
@@ -39,6 +40,12 @@ export default function Recorder({ onAudio, disabled }: Props) {
   useEffect(() => {
     onAudioRef.current = onAudio;
   }, [onAudio]);
+
+  useEffect(() => {
+    onRecording?.(recording);
+    return () => onRecording?.(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recording]);
 
   // Stop any in-flight recording on unmount.
   useEffect(
@@ -112,19 +119,19 @@ export default function Recorder({ onAudio, disabled }: Props) {
   }, [recording, seconds, stop]);
 
   return (
-    <div className="flex flex-wrap items-center gap-3 rounded-xl border border-dashed border-zinc-300 bg-zinc-50 px-4 py-4 dark:border-zinc-700 dark:bg-zinc-950">
+    <div className="flex flex-wrap items-center gap-3 rounded-3xl bg-black/[0.03] px-5 py-6 dark:bg-white/[0.04]">
       <button
         type="button"
         onClick={recording ? stop : start}
         disabled={disabled || (done && !recording)}
         aria-label={recording ? "Stop recording" : "Start recording"}
-        className={`flex h-12 w-12 items-center justify-center rounded-full text-white transition disabled:cursor-not-allowed disabled:opacity-40 ${
-          recording ? "animate-pulse bg-red-600 hover:bg-red-700" : "bg-zinc-900 hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+        className={`flex h-14 w-14 items-center justify-center rounded-full text-white transition disabled:cursor-not-allowed disabled:opacity-40 ${
+          recording ? "animate-pulse bg-red-600 hover:bg-red-700" : "bg-[#14131A] hover:bg-[#2b2938] dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
         }`}
       >
         {recording ? <span className="block h-4 w-4 rounded-sm bg-white" /> : <span className="block h-5 w-3 rounded-sm bg-white dark:bg-zinc-900" />}
       </button>
-      <div className="font-mono text-sm text-zinc-600 dark:text-zinc-400">
+      <div className="font-serif text-xl text-zinc-600 dark:text-zinc-400">
         {done && !recording ? "Recording ready ✓" : recording ? `Recording… ${formatTs(seconds)}` : "Tap to record your recap (up to 15 min)"}
       </div>
       {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
