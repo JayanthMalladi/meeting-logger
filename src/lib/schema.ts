@@ -1,20 +1,20 @@
 import { z } from "zod";
 
+/** What the LLM must return. Items point at segments by index (`seg`); `ts` is added server-side. */
+const item = { text: z.string().min(1), seg: z.number().int().nonnegative().optional() };
+
 export const ExtractedSchema = z.object({
   summary: z.string(),
-  decisions: z.array(z.object({ text: z.string(), ts: z.string().optional() })),
+  decisions: z.array(z.object(item)),
   actions: z.array(
     z.object({
-      text: z.string(),
-      owner: z.string().optional(),
-      due: z.string().optional(),
-      ts: z.string().optional(),
+      ...item,
+      owner: z.string().optional().nullable().transform((v) => v || undefined),
+      due: z.string().optional().nullable().transform((v) => v || undefined),
     }),
   ),
-  openQuestions: z.array(
-    z.object({ text: z.string(), ts: z.string().optional() }),
-  ),
-  atRisk: z.array(z.string()),
+  openQuestions: z.array(z.object(item)),
+  atRisk: z.array(z.string()).max(6),
 });
 
 export type ParsedExtracted = z.infer<typeof ExtractedSchema>;
